@@ -1,12 +1,11 @@
+import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.*;
-
 public class Display extends JPanel {
 
-    private final int tileCount = 16;
+    private final int tileCount = 32;
     private final int tileScale = 1;
 
     private float xOffset;
@@ -14,6 +13,13 @@ public class Display extends JPanel {
 
     private float zoom = 4f;
     private float zoomScale = 10;
+
+    private List<Tile> tiles = new ArrayList<>();
+    private Matrix4 iso;
+
+    private final float[] view = new float[3];
+    private final float[] xRel = new float[] { -0.5f, -0.5f, +0.5f, +0.5f };
+    private final float[] yRel = new float[] { -0.5f, +0.5f, +0.5f, -0.5f };
 
     public Display() {
         MouseInput mouseInput = new MouseInput(this);
@@ -24,17 +30,50 @@ public class Display extends JPanel {
 
         xOffset = -tileCount / 3;
         yOffset = -tileCount / 3;
+
+        setBackground(Color.BLACK);
+        createTileGrid();
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2d.setColor(Color.WHITE);
+        /*
+         * Render Grid as Isometric
+         */
+        iso = createIsometricMatrix((tileScale * zoom) * (float)(Math.floor(this.getWidth() / 100)), ((float)Math.floor(this.getWidth() / 2)) + xOffset, ((float)Math.floor(this.getHeight() / 2)) + yOffset);
 
-        List<Tile> tiles = new ArrayList<>();
+        /*
+         * Draw the Grid to screen
+         */
+        for(int i = 0; i < tiles.size(); i++) {
+            g.setColor(Color.black);
+            if(!tiles.get(i).getIsTile()) {
+                float[] model = tiles.get(i).getQuads();
+                iso.transform(model, view);
+            } else {
+                Polygon p = new Polygon();
+                for (int k = 0; k < 4; k++) {
+                    float[] model = tiles.get(i).getQuads().clone();
 
+                    model[0] += xRel[k];
+                    model[2] += yRel[k];
+
+                    iso.transform(model, view);
+
+                    p.addPoint((int) view[0], (int) view[1]);
+                }
+
+                g.setColor(tiles.get(i).getColor());
+                g.fillPolygon(p);
+
+                g.setColor(Color.black);
+                g.drawPolygon(p);
+            }
+        }
+    }
+
+    private void createTileGrid() {
         /*
          * Create the Grid
          */
@@ -48,58 +87,9 @@ public class Display extends JPanel {
                 tiles.add(new Tile(point, Boolean.TRUE));
             }
         }
-
-        /*
-         * Render Grid as Isometric
-         */
-        Matrix4 iso = createIsometricMatrix((tileScale * zoom) * (float)(Math.floor(this.getWidth() / 100)), ((float)Math.floor(this.getWidth() / 2)) + xOffset, ((float)Math.floor(this.getHeight() / 2)) + yOffset);
-
-        final float[] view = new float[3];
-
-        final float[] xRel = new float[] { -0.5f, -0.5f, +0.5f, +0.5f };
-        final float[] yRel = new float[] { -0.5f, +0.5f, +0.5f, -0.5f };
-
-        /*
-         * Draw the Grid to screen
-         */
-        for(int i = 0; i < tiles.size(); i++) {
-            g2d.setColor(Color.black);
-            if(!tiles.get(i).getIsTile()) {
-                float[] model = tiles.get(i).getQuads();
-                iso.transform(model, view);
-            } else {
-                Polygon p = new Polygon();
-                for (int k = 0; k < 4; k++) {
-                    float[] model = tiles.get(i).getQuads().clone();
-
-                    // translate to tile corners in model space
-                    model[0] += xRel[k];
-                    model[2] += yRel[k];
-
-                    iso.transform(model, view);
-
-                    p.addPoint((int) view[0], (int) view[1]);
-                }
-
-                g2d.setColor(tiles.get(i).getColor());
-                g2d.fillPolygon(p);
-
-                g2d.setColor(Color.black);
-                g2d.drawPolygon(p);
-            }
-        }
-
-        System.out.println("1. " + tiles.get(2).getQuads()[0]);
-        System.out.println("2. " + tiles.get(3).getQuads()[1]);
-        System.out.println("3. " + tiles.get(4).getQuads()[2]);
     }
 
     private Matrix4 createIsometricMatrix(float scale, float x, float y) {
-        // --> 1.0, 0.0, -1.0, 0.0 // x
-        // --> 0.5, 2.0, 0.5, 0.0 // y
-        // --> 0.0, -0.05, 0.0, 0.0 // depth
-        // --> 0.0, 0.0, 0.0, 1.0 // [nothing]
-
         Matrix4 iso = new Matrix4();
         iso.m00 = iso.m33 = 1.0f * scale;
         iso.m10 = iso.m12 = 0.5f * scale;
@@ -119,7 +109,6 @@ public class Display extends JPanel {
     public void setOffset(float x, float y) {
         xOffset = xOffset + x;
         yOffset = yOffset + y;
-        repaint();
     }
 
 }
