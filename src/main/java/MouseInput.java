@@ -3,6 +3,8 @@ import java.awt.event.*;
 public class MouseInput implements MouseListener, MouseWheelListener, MouseMotionListener {
 
     private Display display;
+    public int x;
+    public int y;
 
     public MouseInput(Display display) {
         this.display = display;
@@ -46,6 +48,8 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        System.out.println(Math.floor(e.getX()));
+        x = e.getX();
+        y = e.getY();
+        display.repaint();
     }
 }
