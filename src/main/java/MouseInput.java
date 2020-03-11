@@ -26,6 +26,14 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
             dragStartX = e.getX();
             dragStartY = e.getY();
         }
+
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            display.addTile(display.selectedTileX, display.selectedTileY);
+        }
+
+        if(e.getButton() == MouseEvent.BUTTON3) {
+            display.addObject(display.selectedTileX, display.selectedTileY);
+        }
     }
 
     @Override
@@ -58,6 +66,9 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
             dragDistanceX = (dragStartX - e.getX()) / 50;
             dragDistanceY = (dragStartY - e.getY()) / 50;
         }
+
+        x = e.getX();
+        y = e.getY();
     }
 
     @Override
