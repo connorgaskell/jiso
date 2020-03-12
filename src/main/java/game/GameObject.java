@@ -1,12 +1,15 @@
+package game;
+
 import java.awt.image.BufferedImage;
 
 public class GameObject {
 
     private BufferedImage objectImage;
     private boolean canPlaceOn;
+    private boolean isWalkable;
     private int heightOffset;
 
-    public GameObject(BufferedImage objectImage, boolean canPlaceOn, int heightOffset) {
+    public GameObject(BufferedImage objectImage, boolean canPlaceOn, boolean isWalkable, int heightOffset) {
         this.objectImage = objectImage;
         this.canPlaceOn = canPlaceOn;
         this.heightOffset = heightOffset;

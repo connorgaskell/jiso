@@ -1,3 +1,7 @@
+package game;
+
+import vector.Vector2;
+
 import java.awt.event.*;
 
 public class MouseInput implements MouseListener, MouseWheelListener, MouseMotionListener {
@@ -6,8 +10,8 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
     public int x;
     public int y;
 
-    private int dragStartX, dragStartY;
-    public int dragDistanceX, dragDistanceY;
+    private Vector2 dragStart = new Vector2();
+    public Vector2 dragDistance = new Vector2();
     private boolean middleMouseDown = false;
 
     public MouseInput(Display display) {
@@ -23,16 +27,16 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
     public void mousePressed(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON2) {
             middleMouseDown = true;
-            dragStartX = e.getX();
-            dragStartY = e.getY();
+            dragStart.x = e.getX();
+            dragStart.y = e.getY();
         }
 
         if(e.getButton() == MouseEvent.BUTTON1) {
-            display.addTile(display.selectedTileX, display.selectedTileY);
+            display.addTile(display.selectedTile.x, display.selectedTile.y);
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
-            display.addObject(display.selectedTileX, display.selectedTileY);
+            display.addObject(display.selectedTile.x, display.selectedTile.y);
         }
     }
 
@@ -40,8 +44,8 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
     public void mouseReleased(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON2) {
             middleMouseDown = false;
-            dragDistanceX = 0;
-            dragDistanceY = 0;
+            dragDistance.x = 0;
+            dragDistance.y = 0;
         }
     }
 
@@ -63,8 +67,8 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
     @Override
     public void mouseDragged(MouseEvent e) {
         if(middleMouseDown) {
-            dragDistanceX = (dragStartX - e.getX()) / 50;
-            dragDistanceY = (dragStartY - e.getY()) / 50;
+            dragDistance.x = (dragStart.x - e.getX()) / 50;
+            dragDistance.y = (dragStart.y - e.getY()) / 50;
         }
 
         x = e.getX();
