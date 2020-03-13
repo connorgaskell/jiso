@@ -1,14 +1,17 @@
-package game;
+package engine;
 
-import ui.Anchor;
-import ui.Label;
-import ui.UIComponent;
+import engine.ui.Anchor;
+import engine.ui.Button;
+import engine.ui.Image;
+import engine.ui.Label;
+import engine.ui.UIComponent;
 import vector.Vector2;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,12 +29,17 @@ public class Display extends JPanel {
     private float xOffset, yOffset;
     private float zoom = 1f, zoomScale = 10;
 
+    private boolean displayCreated = false;
+
     private MouseInput mouseInput;
-    private BufferedImage objectImage, floorImage, highlightImage;
+    private BufferedImage objectImage, floorImage, highlightImage, menuImage;
     private Font mainFont;
 
     private ArrayList<Tile> tiles = new ArrayList<>();
+
     private ArrayList<UIComponent> labels = new ArrayList<>();
+    private ArrayList<UIComponent> images = new ArrayList<>();
+    private ArrayList<UIComponent> buttons = new ArrayList<>();
 
     public Display() {
         mouseInput = new MouseInput(this);
@@ -40,6 +48,7 @@ public class Display extends JPanel {
         addMouseMotionListener(mouseInput);
         addMouseWheelListener(mouseInput);
 
+        setLayout(null);
         setDoubleBuffered(true);
         setBackground(Color.darkGray);
 
@@ -47,13 +56,12 @@ public class Display extends JPanel {
             objectImage = ImageIO.read(this.getClass().getResource("../Images/TileObject.png"));
             floorImage = ImageIO.read(this.getClass().getResource("../Images/FloorTile.png"));
             highlightImage = ImageIO.read(this.getClass().getResource("../Images/HighlightTile.png"));
+            menuImage = ImageIO.read(this.getClass().getResource("../Images/TestImage.png"));
 
             mainFont = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream("../Fonts/yoster.ttf"));
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(mainFont);
         } catch (IOException | FontFormatException e) { }
-
-        createDefaultMap();
 
         new Timer(1000 / 60, (ActionEvent e) -> {
             repaint();
@@ -70,7 +78,19 @@ public class Display extends JPanel {
         tiles.get(0).addGameObject(new GameObject(objectImage, false, false, 0));
         sortTiles();
 
-        labels.add(new Label(this, "", mainFont, 20.0f, Color.white, new Vector2(0, 0)));
+        labels.add(new Label("", mainFont, 20.0f, Color.white, new Vector2(0, 0), ""));
+        //images.add(new Image(menuImage, new Vector2(200, 200), Anchor.CENTER, new Vector2(0, 0), "imgTest"));
+
+        Image image = new Image(menuImage, new Vector2(400, 400), Anchor.CENTER, new Vector2(0, 0), "imgTest");
+        Button button = new Button(image, new Vector2(0, 0), Anchor.CENTER, "");
+        button.getButton().addActionListener(e -> {
+            button.setAnchor(Anchor.BOTTOM);
+        });
+
+        buttons.add(button);
+
+        Label label = new Label("Game - Version 0.0.1", mainFont, 12.0f, Color.white, Anchor.BOTTOM_LEFT, new Vector2(8, 6), "lblVersion");
+        if(!labels.contains(label)) labels.add(label);
     }
 
     public void addTile(int x, int y) {
@@ -83,7 +103,7 @@ public class Display extends JPanel {
             getTile(x, y).addGameObject(new GameObject(objectImage, false, false, 0));
         } catch(Exception e) {
             String message = "You cannot place an object here!";
-            Label label = new Label(this, message, mainFont, 14.0f, Color.white, Anchor.BOTTOM_RIGHT, new Vector2(8, 6));
+            Label label = new Label(message, mainFont, 14.0f, Color.white, Anchor.TOP_LEFT, new Vector2(8, 18), "lblObjPlaceWarning");
 
             if(!labels.contains(label)) labels.add(label);
             label.destroyComponentAfterTime(labels,1000);
@@ -185,15 +205,39 @@ public class Display extends JPanel {
         } catch(Exception e) { }
     }
 
+    public void displayImage(Image image) {
+        g.drawImage(image.getImage(), image.position.x, image.position.y, image.getSize().x, image.getSize().y, null);
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
+        if(!displayCreated) createDefaultMap(); displayCreated = true;
         createTileMap();
         dragOffset(mouseInput.dragDistance.x, mouseInput.dragDistance.y, 2.0f);
 
         for(int i = 0; i < labels.size(); i++) {
             displayLabel((Label)labels.get(i));
-            labels.get(i).anchor(g.getFontMetrics().stringWidth(((Label) labels.get(i)).getText()), 0, ((Label) labels.get(i)).getAnchor());
+            labels.get(i).anchor(this, g.getFontMetrics().stringWidth(((Label) labels.get(i)).getText()), 0, ((Label) labels.get(i)).getAnchor());
+        }
+
+        for(int i = 0; i < images.size(); i++) {
+            Image image = (Image)images.get(i);
+            displayImage(image);
+            image.anchor(this, image.getBounds().x, image.getBounds().y, image.getAnchor());
+
+            if(image.checkIntersection(mouseInput.x, mouseInput.y)) {
+                image.setSize(new Vector2(image.getBounds().x - 5, image.getBounds().y - 5));
+            } else {
+                image.setSize(image.getBounds());
+            }
+
+        }
+
+        for(int i = 0; i < buttons.size(); i++) {
+            Button button = (Button)buttons.get(i);
+            button.anchor(this, button.getBounds().x, button.getBounds().y, button.getAnchor());
+            button.setPosition();
         }
     }
 

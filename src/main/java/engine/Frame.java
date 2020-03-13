@@ -1,17 +1,14 @@
-package game;
+package engine;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Frame extends JFrame {
 
-    private Display display;
+    //private Display display;
 
-    public Frame() {
+    public Frame(Display display) {
         setLayout(new BorderLayout());
-
-        display = new Display();
-        getContentPane().add(display, BorderLayout.CENTER);
 
         setTitle("JISO - Java Isometric Game Engine");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -20,7 +17,11 @@ public class Frame extends JFrame {
         setMinimumSize(new Dimension(800, 600));
         setLocationRelativeTo(null);
 
-        addKeyListener(new KeyInput(display));
+        //Engine.display = new Display();
+        //Engine.display.setLayout(null);
+        getContentPane().add(display, BorderLayout.CENTER);
+
+        addKeyListener(new KeyInput(Engine.display));
     }
 
 }

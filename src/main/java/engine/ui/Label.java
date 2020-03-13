@@ -1,20 +1,20 @@
-package ui;
+package engine.ui;
 
 import vector.Vector2;
-import game.Display;
 
 import java.awt.*;
 
 public class Label extends UIComponent {
 
+    private String name;
     private String text;
     private Font font;
     private float size;
     private Color color;
     private Anchor anchor;
 
-    public Label(Display panel, String text, Font font, float size, Color color, Vector2 position) {
-        super(panel, position);
+    public Label(String text, Font font, float size, Color color, Vector2 position, String name) {
+        super(name, position);
         this.text = text;
         this.font = font;
         this.size = size;
@@ -22,8 +22,8 @@ public class Label extends UIComponent {
         this.anchor = Anchor.NONE;
     }
 
-    public Label(Display panel, String text, Font font, float size, Color color, Anchor anchor) {
-        super(panel, new Vector2(0, 0));
+    public Label(String text, Font font, float size, Color color, Anchor anchor, String name) {
+        super(name, new Vector2(0, 0));
         this.text = text;
         this.font = font;
         this.size = size;
@@ -32,8 +32,8 @@ public class Label extends UIComponent {
         this.padding = new Vector2(0, 0);
     }
 
-    public Label(Display panel, String text, Font font, float size, Color color, Anchor anchor, Vector2 padding) {
-        super(panel, new Vector2(0, 0));
+    public Label(String text, Font font, float size, Color color, Anchor anchor, Vector2 padding, String name) {
+        super(name, new Vector2(0, 0));
         this.text = text;
         this.font = font;
         this.size = size;

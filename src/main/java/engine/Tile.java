@@ -1,4 +1,4 @@
-package game;
+package engine;
 
 import java.awt.image.*;
 import java.util.*;
