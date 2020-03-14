@@ -1,4 +1,4 @@
-package engine;
+package engine.anim;
 
 import java.awt.*;
 import java.util.*;

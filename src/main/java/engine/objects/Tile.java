@@ -1,4 +1,6 @@
-package engine;
+package engine.objects;
+
+import engine.objects.GameObject;
 
 import java.awt.image.*;
 import java.util.*;

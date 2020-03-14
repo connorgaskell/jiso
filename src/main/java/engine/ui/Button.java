@@ -1,7 +1,7 @@
 package engine.ui;
 
-import engine.Engine;
-import vector.Vector2;
+import engine.Main;
+import engine.vector.Vector2;
 
 import javax.swing.*;
 
@@ -32,10 +32,10 @@ public class Button extends UIComponent {
         this.button.setFocusPainted(false);
         this.button.setContentAreaFilled(false);
 
-        anchor(Engine.display, image.getSize().x, image.getSize().y, Anchor.TOP_RIGHT);
+        anchor(Main.display, image.getSize().x, image.getSize().y, Anchor.TOP_RIGHT);
         setPosition();
 
-        Engine.display.add(this.button);
+        Main.display.add(this.button);
     }
 
     public void setAnchor(Anchor anchor) {

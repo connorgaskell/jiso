@@ -1,11 +1,11 @@
-package engine;
+package engine.core;
+
+import engine.input.KeyInput;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Frame extends JFrame {
-
-    //private Display display;
 
     public Frame(Display display) {
         setLayout(new BorderLayout());
@@ -17,11 +17,8 @@ public class Frame extends JFrame {
         setMinimumSize(new Dimension(800, 600));
         setLocationRelativeTo(null);
 
-        //Engine.display = new Display();
-        //Engine.display.setLayout(null);
         getContentPane().add(display, BorderLayout.CENTER);
-
-        addKeyListener(new KeyInput(Engine.display));
+        addKeyListener(new KeyInput(display.camera));
     }
 
 }

@@ -1,17 +1,21 @@
-package engine;
+package engine.core;
 
+import engine.input.MouseInput;
+import engine.objects.Camera;
+import engine.objects.GameObject;
+import engine.objects.Tile;
+import engine.script.ScriptLoader;
 import engine.ui.Anchor;
 import engine.ui.Button;
 import engine.ui.Image;
 import engine.ui.Label;
 import engine.ui.UIComponent;
-import vector.Vector2;
+import engine.vector.Vector2;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,15 +27,15 @@ public class Display extends JPanel {
     public Graphics g;
     private int tileColumnOffset, tileRowOffset;
     private Vector2 origin = new Vector2();
-    private int xTiles = 32, yTiles = 32;
+    private int numTiles = 32;
     public Vector2 selectedTile = new Vector2();
 
-    private float xOffset, yOffset;
-    private float zoom = 1f, zoomScale = 10;
+    Camera camera = new Camera(numTiles);
 
     private boolean displayCreated = false;
 
     private MouseInput mouseInput;
+    private ScriptLoader scriptLoader;
     private BufferedImage objectImage, floorImage, highlightImage, menuImage;
     private Font mainFont;
 
@@ -42,7 +46,10 @@ public class Display extends JPanel {
     private ArrayList<UIComponent> buttons = new ArrayList<>();
 
     public Display() {
-        mouseInput = new MouseInput(this);
+        mouseInput = new MouseInput(this, camera);
+        try {
+            scriptLoader = new ScriptLoader();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) { }
 
         addMouseListener(mouseInput);
         addMouseMotionListener(mouseInput);
@@ -53,44 +60,20 @@ public class Display extends JPanel {
         setBackground(Color.darkGray);
 
         try {
-            objectImage = ImageIO.read(this.getClass().getResource("../Images/TileObject.png"));
-            floorImage = ImageIO.read(this.getClass().getResource("../Images/FloorTile.png"));
-            highlightImage = ImageIO.read(this.getClass().getResource("../Images/HighlightTile.png"));
-            menuImage = ImageIO.read(this.getClass().getResource("../Images/TestImage.png"));
+            objectImage = ImageIO.read(this.getClass().getResource("../../Images/TileObject.png"));
+            floorImage = ImageIO.read(this.getClass().getResource("../../Images/FloorTile.png"));
+            highlightImage = ImageIO.read(this.getClass().getResource("../../Images/HighlightTile.png"));
+            menuImage = ImageIO.read(this.getClass().getResource("../../Images/TestImage.png"));
 
-            mainFont = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream("../Fonts/yoster.ttf"));
+            mainFont = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream("../../Fonts/yoster.ttf"));
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(mainFont);
         } catch (IOException | FontFormatException e) { }
 
         new Timer(1000 / 60, (ActionEvent e) -> {
+            for(int i = 0; i < scriptLoader.getLoadedScripts().size(); i++) { scriptLoader.getLoadedScripts().get(i).onUpdate(); }
             repaint();
         }).start();
-    }
-
-    private void createDefaultMap() {
-        for(int x = 0; x < 10; x++) {
-            for(int y = 0; y < 10; y++) {
-                tiles.add(new Tile(x, y, floorImage));
-            }
-        }
-
-        tiles.get(0).addGameObject(new GameObject(objectImage, false, false, 0));
-        sortTiles();
-
-        labels.add(new Label("", mainFont, 20.0f, Color.white, new Vector2(0, 0), ""));
-        //images.add(new Image(menuImage, new Vector2(200, 200), Anchor.CENTER, new Vector2(0, 0), "imgTest"));
-
-        Image image = new Image(menuImage, new Vector2(400, 400), Anchor.CENTER, new Vector2(0, 0), "imgTest");
-        Button button = new Button(image, new Vector2(0, 0), Anchor.CENTER, "");
-        button.getButton().addActionListener(e -> {
-            button.setAnchor(Anchor.BOTTOM);
-        });
-
-        buttons.add(button);
-
-        Label label = new Label("Game - Version 0.0.1", mainFont, 12.0f, Color.white, Anchor.BOTTOM_LEFT, new Vector2(8, 6), "lblVersion");
-        if(!labels.contains(label)) labels.add(label);
     }
 
     public void addTile(int x, int y) {
@@ -120,11 +103,11 @@ public class Display extends JPanel {
     }
 
     private void createTileMap() {
-        tileColumnOffset = (int)(64 * zoom);
+        tileColumnOffset = (int)(64 * camera.getZoom());
         tileRowOffset = tileColumnOffset / 2;
 
-        origin.x = (int)((getWidth() / 2 - xTiles * tileColumnOffset / 2) + xOffset);
-        origin.y = (int)((getHeight() / 2) + yOffset);
+        origin.x = (int)((getWidth() / 2 - numTiles * tileColumnOffset / 2) + camera.getOffsetX());
+        origin.y = (int)((getHeight() / 2) + camera.getOffsetY());
 
         int mouseX = mouseInput.x - tileColumnOffset / 2 - origin.x;
         int mouseY = mouseInput.y - tileRowOffset / 2 - origin.y;
@@ -132,14 +115,12 @@ public class Display extends JPanel {
         selectedTile.y = (int)Math.round((mouseY + mouseX * 0.5) / tileRowOffset);
         selectedTile.x = -(int)Math.round((mouseY - mouseX * 0.5) / tileRowOffset);
 
-        //System.out.println(selectedTileX + " | " + selectedTileY);
-
         try {
             for(int i = 0; i < tiles.size(); i++) {
                 drawFloor(tiles.get(i).getX(), tiles.get(i).getY(), tiles.get(i).getImage());
             }
 
-            if(selectedTile.x >= 0 && selectedTile.x < xTiles && selectedTile.y >= 0 && selectedTile.y < yTiles) drawImage(selectedTile.x, selectedTile.y, 4, highlightImage);
+            if(selectedTile.x >= 0 && selectedTile.x < numTiles && selectedTile.y >= 0 && selectedTile.y < numTiles) drawImage(selectedTile.x, selectedTile.y, 4, highlightImage);
 
             for (int i = 0; i < tiles.size(); i++) {
                 for (int j = 0; j < tiles.get(i).getGameObjects().size(); j++) {
@@ -162,10 +143,10 @@ public class Display extends JPanel {
         int offX = x * tileColumnOffset / 2 + y * tileColumnOffset / 2 + origin.x;
         int offY = y * tileRowOffset / 2 - x * tileRowOffset / 2 + origin.y;
 
-        g.drawImage(image, offX, offY - (int) ((28 + heightOffset) * zoom), (int) (image.getWidth() * zoom), (int) (image.getHeight() * zoom), null);
+        g.drawImage(image, offX, offY - (int) ((28 + heightOffset) * camera.getZoom()), (int) (image.getWidth() * camera.getZoom()), (int) (image.getHeight() * camera.getZoom()), null);
     }
 
-    private void drawTile(int x, int y, Color color) {
+    public void drawGrid(int x, int y, Color color) {
         g.setColor(color);
         int offX = x * tileColumnOffset / 2 + y * tileColumnOffset / 2 + origin.x;
         int offY = y * tileRowOffset / 2 - x * tileRowOffset / 2 + origin.y;
@@ -176,26 +157,7 @@ public class Display extends JPanel {
         g.drawLine(offX + tileColumnOffset / 2, offY + tileRowOffset, offX, offY + tileRowOffset / 2);
     }
 
-    public void setZoom(float value) {
-        value = value / zoomScale;
-        zoom = zoom <= 1 && value < 0 ? 1 : zoom + value;
-    }
-
-    public void setOffset(float x, float y) {
-        setOffset(x, y, 250);
-    }
-
-    public void setOffset(float x, float y, float max) {
-        max = (max * zoom) * (xTiles / 10);
-        xOffset = xOffset >= max * 2 && x > 0 ? max * 2 : xOffset <= -max * 2 && x < 0 ? -max * 2 : xOffset + x;
-        yOffset = yOffset >= max && y > 0 ? max : yOffset <= -max && y < 0 ? -max : yOffset + y;
-    }
-
-    public void dragOffset(float distanceX, float distanceY, float dragSpeed) {
-        setOffset(distanceX * dragSpeed, distanceY * dragSpeed);
-    }
-
-    public void displayLabel(Label label) {
+    private void displayLabel(Label label) {
         try {
             g.setColor(label.getColor());
             g.setFont(label.getFont());
@@ -205,7 +167,7 @@ public class Display extends JPanel {
         } catch(Exception e) { }
     }
 
-    public void displayImage(Image image) {
+    private void displayImage(Image image) {
         g.drawImage(image.getImage(), image.position.x, image.position.y, image.getSize().x, image.getSize().y, null);
     }
 
@@ -214,7 +176,9 @@ public class Display extends JPanel {
         this.g = g;
         if(!displayCreated) createDefaultMap(); displayCreated = true;
         createTileMap();
-        dragOffset(mouseInput.dragDistance.x, mouseInput.dragDistance.y, 2.0f);
+        camera.dragOffset(mouseInput.dragDistance.x, mouseInput.dragDistance.y, 2.0f);
+
+        System.out.println(origin.x + " | " + origin.y);
 
         for(int i = 0; i < labels.size(); i++) {
             displayLabel((Label)labels.get(i));
@@ -231,7 +195,6 @@ public class Display extends JPanel {
             } else {
                 image.setSize(image.getBounds());
             }
-
         }
 
         for(int i = 0; i < buttons.size(); i++) {
@@ -239,6 +202,42 @@ public class Display extends JPanel {
             button.anchor(this, button.getBounds().x, button.getBounds().y, button.getAnchor());
             button.setPosition();
         }
+    }
+
+    /*
+     * Method for testing various functions.
+     */
+    private void createDefaultMap() {
+        for(int x = 0; x < 10; x++) {
+            for(int y = 0; y < 10; y++) {
+                tiles.add(new Tile(x, y, floorImage));
+            }
+        }
+
+        tiles.get(0).addGameObject(new GameObject(objectImage, false, false, 0));
+        sortTiles();
+
+        labels.add(new Label("", mainFont, 20.0f, Color.white, new Vector2(0, 0), ""));
+        //images.add(new Image(menuImage, new Vector2(200, 200), Anchor.CENTER, new Vector2(0, 0), "imgTest"));
+
+        Image image = new Image(floorImage, new Vector2(64, 64), Anchor.CENTER, new Vector2(0, 0), "imgTest");
+        Button button = new Button(image, new Vector2(0, 0), Anchor.BOTTOM, "");
+        button.getButton().addActionListener(e -> {
+            button.setAnchor(Anchor.BOTTOM);
+        });
+
+        Image image2 = new Image(floorImage, new Vector2(64, 64), Anchor.CENTER, new Vector2(0, 0), "imgTest2");
+        Button button2 = new Button(image2, new Vector2(0, 0), Anchor.BOTTOM, "");
+        button2.setOffset(1.25f, 0);
+        button2.getButton().addActionListener(e -> {
+            button2.setAnchor(Anchor.BOTTOM);
+        });
+
+        buttons.add(button);
+        buttons.add(button2);
+
+        Label label = new Label("Game - Version 0.0.1", mainFont, 12.0f, Color.white, Anchor.BOTTOM_LEFT, new Vector2(8, 6), "lblVersion");
+        if(!labels.contains(label)) labels.add(label);
     }
 
 }

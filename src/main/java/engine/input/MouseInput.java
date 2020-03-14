@@ -1,12 +1,16 @@
-package engine;
+package engine.input;
 
-import vector.Vector2;
+import engine.core.Display;
+import engine.objects.Camera;
+import engine.vector.Vector2;
 
 import java.awt.event.*;
 
 public class MouseInput implements MouseListener, MouseWheelListener, MouseMotionListener {
 
     private Display display;
+    private Camera camera;
+
     public int x;
     public int y;
 
@@ -14,8 +18,9 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
     public Vector2 dragDistance = new Vector2();
     private boolean middleMouseDown = false;
 
-    public MouseInput(Display display) {
+    public MouseInput(Display display, Camera camera) {
         this.display = display;
+        this.camera = camera;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        display.setZoom(-e.getWheelRotation());
+        camera.setZoom(-e.getWheelRotation());
     }
 
     @Override

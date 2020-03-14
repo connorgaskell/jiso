@@ -1,6 +1,6 @@
 package engine.ui;
 
-import vector.Vector2;
+import engine.vector.Vector2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

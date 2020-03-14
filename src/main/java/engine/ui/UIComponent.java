@@ -1,7 +1,7 @@
 package engine.ui;
 
-import engine.Display;
-import vector.Vector2;
+import engine.core.Display;
+import engine.vector.Vector2;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -11,10 +11,18 @@ public class UIComponent {
     public String name;
     public Vector2 position;
     public Vector2 padding;
+    public float offsetX, offsetY;
 
     public UIComponent(String name, Vector2 position) {
         this.position = position;
         padding = new Vector2(0, 0);
+        offsetX = 0;
+        offsetY = 0;
+    }
+
+    public void setOffset(float x, float y) {
+        offsetX = x;
+        offsetY = y;
     }
 
     public void destroyComponent(ArrayList<UIComponent> components) {
@@ -28,6 +36,8 @@ public class UIComponent {
     }
 
     public void anchor(Display panel, int width, int height, Anchor type) {
+        int originalWidth = width, originalHeight = height;
+
         switch (type) {
             case NONE:
                 break;
@@ -66,6 +76,9 @@ public class UIComponent {
                 position = new Vector2(panel.getWidth() - width - padding.x, (panel.getHeight() / 2) - height);
                 break;
         }
+
+        position.x += (int)(offsetX * originalWidth);
+        position.y += (int)(offsetY * originalHeight);
     }
 
 }

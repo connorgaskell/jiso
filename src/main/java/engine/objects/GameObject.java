@@ -1,4 +1,4 @@
-package engine;
+package engine.objects;
 
 import java.awt.image.BufferedImage;
 
