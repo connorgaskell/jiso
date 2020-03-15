@@ -5,11 +5,10 @@ import engine.objects.Camera;
 import engine.objects.GameObject;
 import engine.objects.Tile;
 import engine.script.ScriptLoader;
-import engine.ui.Anchor;
+import engine.ui.*;
 import engine.ui.Button;
 import engine.ui.Image;
 import engine.ui.Label;
-import engine.ui.UIComponent;
 import engine.vector.Vector2;
 
 import javax.imageio.ImageIO;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class Display extends JPanel {
 
-    public Graphics g;
+    public Graphics graphics;
     private int tileColumnOffset, tileRowOffset;
     private Vector2 origin = new Vector2();
     private int numTiles = 32;
@@ -35,21 +34,15 @@ public class Display extends JPanel {
     private boolean displayCreated = false;
 
     private MouseInput mouseInput;
+    private UI ui;
     private ScriptLoader scriptLoader;
     private BufferedImage objectImage, floorImage, highlightImage, menuImage;
     private Font mainFont;
 
     private ArrayList<Tile> tiles = new ArrayList<>();
 
-    private ArrayList<UIComponent> labels = new ArrayList<>();
-    private ArrayList<UIComponent> images = new ArrayList<>();
-    private ArrayList<UIComponent> buttons = new ArrayList<>();
-
     public Display() {
         mouseInput = new MouseInput(this, camera);
-        try {
-            scriptLoader = new ScriptLoader();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) { }
 
         addMouseListener(mouseInput);
         addMouseMotionListener(mouseInput);
@@ -70,10 +63,6 @@ public class Display extends JPanel {
             ge.registerFont(mainFont);
         } catch (IOException | FontFormatException e) { }
 
-        new Timer(1000 / 60, (ActionEvent e) -> {
-            for(int i = 0; i < scriptLoader.getLoadedScripts().size(); i++) { scriptLoader.getLoadedScripts().get(i).onUpdate(); }
-            repaint();
-        }).start();
     }
 
     public void addTile(int x, int y) {
@@ -86,10 +75,10 @@ public class Display extends JPanel {
             getTile(x, y).addGameObject(new GameObject(objectImage, false, false, 0));
         } catch(Exception e) {
             String message = "You cannot place an object here!";
-            Label label = new Label(message, mainFont, 14.0f, Color.white, Anchor.TOP_LEFT, new Vector2(8, 18), "lblObjPlaceWarning");
+            Label label = new Label(message, mainFont, 14.0f, Color.white, Anchor.TOP_LEFT, new Vector2(8, 8), "lblObjPlaceWarning");
 
-            if(!labels.contains(label)) labels.add(label);
-            label.destroyComponentAfterTime(labels,1000);
+            if(!ui.getLabels().contains(label)) ui.addLabel(label);
+            label.destroyComponentAfterTime(ui.getLabels(),1000);
         }
     }
 
@@ -143,50 +132,41 @@ public class Display extends JPanel {
         int offX = x * tileColumnOffset / 2 + y * tileColumnOffset / 2 + origin.x;
         int offY = y * tileRowOffset / 2 - x * tileRowOffset / 2 + origin.y;
 
-        g.drawImage(image, offX, offY - (int) ((28 + heightOffset) * camera.getZoom()), (int) (image.getWidth() * camera.getZoom()), (int) (image.getHeight() * camera.getZoom()), null);
+        graphics.drawImage(image, offX, offY - (int) ((28 + heightOffset) * camera.getZoom()), (int) (image.getWidth() * camera.getZoom()), (int) (image.getHeight() * camera.getZoom()), null);
     }
 
     public void drawGrid(int x, int y, Color color) {
-        g.setColor(color);
+        graphics.setColor(color);
         int offX = x * tileColumnOffset / 2 + y * tileColumnOffset / 2 + origin.x;
         int offY = y * tileRowOffset / 2 - x * tileRowOffset / 2 + origin.y;
 
-        g.drawLine(offX, offY + tileRowOffset / 2, offX + tileColumnOffset / 2, offY);
-        g.drawLine(offX + tileColumnOffset / 2, offY, offX + tileColumnOffset, offY + tileRowOffset / 2);
-        g.drawLine(offX + tileColumnOffset, offY + tileRowOffset / 2, offX + tileColumnOffset / 2, offY + tileRowOffset);
-        g.drawLine(offX + tileColumnOffset / 2, offY + tileRowOffset, offX, offY + tileRowOffset / 2);
-    }
-
-    private void displayLabel(Label label) {
-        try {
-            g.setColor(label.getColor());
-            g.setFont(label.getFont());
-            Font resizedFont = g.getFont().deriveFont(label.getSize());
-            g.setFont(resizedFont);
-            g.drawString(label.getText(), label.position.x, label.position.y);
-        } catch(Exception e) { }
+        graphics.drawLine(offX, offY + tileRowOffset / 2, offX + tileColumnOffset / 2, offY);
+        graphics.drawLine(offX + tileColumnOffset / 2, offY, offX + tileColumnOffset, offY + tileRowOffset / 2);
+        graphics.drawLine(offX + tileColumnOffset, offY + tileRowOffset / 2, offX + tileColumnOffset / 2, offY + tileRowOffset);
+        graphics.drawLine(offX + tileColumnOffset / 2, offY + tileRowOffset, offX, offY + tileRowOffset / 2);
     }
 
     private void displayImage(Image image) {
-        g.drawImage(image.getImage(), image.position.x, image.position.y, image.getSize().x, image.getSize().y, null);
+        graphics.drawImage(image.getImage(), image.position.x, image.position.y, image.getSize().x, image.getSize().y, null);
+    }
+
+    public Font getMainFont() {
+        return mainFont;
+    }
+
+    public MouseInput getMouseInput() {
+        return mouseInput;
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.g = g;
+        this.graphics = g;
         if(!displayCreated) createDefaultMap(); displayCreated = true;
         createTileMap();
         camera.dragOffset(mouseInput.dragDistance.x, mouseInput.dragDistance.y, 2.0f);
 
-        System.out.println(origin.x + " | " + origin.y);
-
-        for(int i = 0; i < labels.size(); i++) {
-            displayLabel((Label)labels.get(i));
-            labels.get(i).anchor(this, g.getFontMetrics().stringWidth(((Label) labels.get(i)).getText()), 0, ((Label) labels.get(i)).getAnchor());
-        }
-
-        for(int i = 0; i < images.size(); i++) {
-            Image image = (Image)images.get(i);
+        for(int i = 0; i < ui.getImages().size(); i++) {
+            Image image = (Image)ui.getImages().get(i);
             displayImage(image);
             image.anchor(this, image.getBounds().x, image.getBounds().y, image.getAnchor());
 
@@ -196,17 +176,8 @@ public class Display extends JPanel {
                 image.setSize(image.getBounds());
             }
         }
-
-        for(int i = 0; i < buttons.size(); i++) {
-            Button button = (Button)buttons.get(i);
-            button.anchor(this, button.getBounds().x, button.getBounds().y, button.getAnchor());
-            button.setPosition();
-        }
     }
 
-    /*
-     * Method for testing various functions.
-     */
     private void createDefaultMap() {
         for(int x = 0; x < 10; x++) {
             for(int y = 0; y < 10; y++) {
@@ -214,30 +185,46 @@ public class Display extends JPanel {
             }
         }
 
+        ui = new UI(this);
+
         tiles.get(0).addGameObject(new GameObject(objectImage, false, false, 0));
         sortTiles();
 
-        labels.add(new Label("", mainFont, 20.0f, Color.white, new Vector2(0, 0), ""));
-        //images.add(new Image(menuImage, new Vector2(200, 200), Anchor.CENTER, new Vector2(0, 0), "imgTest"));
+        ui.addLabel(new Label("", mainFont, 20.0f, Color.white, Anchor.CENTER, new Vector2(0, 0), ""));
+        //ui.addImage(new Image(menuImage, new Vector2(200, 200), Anchor.CENTER, new Vector2(0, 0), "imgTest"));
 
         Image image = new Image(floorImage, new Vector2(64, 64), Anchor.CENTER, new Vector2(0, 0), "imgTest");
         Button button = new Button(image, new Vector2(0, 0), Anchor.BOTTOM, "");
         button.getButton().addActionListener(e -> {
-            button.setAnchor(Anchor.BOTTOM);
+            button.setAnchor(Anchor.CENTER_RIGHT);
         });
 
         Image image2 = new Image(floorImage, new Vector2(64, 64), Anchor.CENTER, new Vector2(0, 0), "imgTest2");
         Button button2 = new Button(image2, new Vector2(0, 0), Anchor.BOTTOM, "");
         button2.setOffset(1.25f, 0);
         button2.getButton().addActionListener(e -> {
-            button2.setAnchor(Anchor.BOTTOM);
+            button2.setAnchor(Anchor.TOP);
         });
 
-        buttons.add(button);
-        buttons.add(button2);
+        ui.addButton(button);
+        ui.addButton(button2);
 
-        Label label = new Label("Game - Version 0.0.1", mainFont, 12.0f, Color.white, Anchor.BOTTOM_LEFT, new Vector2(8, 6), "lblVersion");
-        if(!labels.contains(label)) labels.add(label);
+        Label label = new Label("Game - Version 0.0.1", mainFont, 12.0f, Color.white, Anchor.BOTTOM_LEFT, new Vector2(0, 0), "lblVersion");
+        if(!ui.getLabels().contains(label)) ui.addLabel(label);
+
+        try {
+            scriptLoader = new ScriptLoader();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) { }
+
+        new Timer(1000 / 60, (ActionEvent e) -> {
+            if(scriptLoader != null) {
+                for (int i = 0; i < scriptLoader.getLoadedScripts().size(); i++) {
+                    scriptLoader.getLoadedScripts().get(i).onDrawFrame();
+                }
+            }
+            repaint();
+            if(ui != null) ui.renderUI();
+        }).start();
     }
 
 }

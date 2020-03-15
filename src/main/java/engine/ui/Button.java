@@ -23,6 +23,7 @@ public class Button extends UIComponent {
         this.button = new JButton();
 
         image.position = this.position;
+        this.jComponent = this.button;
 
         this.button.setLayout(null);
         this.button.setBounds(this.position.x, this.position.y, image.getSize().x, image.getSize().y);
