@@ -95,8 +95,8 @@ public class Display extends JPanel {
         tileColumnOffset = (int)(64 * camera.getZoom());
         tileRowOffset = tileColumnOffset / 2;
 
-        origin.x = (int)((getWidth() / 2 - numTiles * tileColumnOffset / 2) + camera.getOffsetX());
-        origin.y = (int)((getHeight() / 2) + camera.getOffsetY());
+        origin.x = (int)((getWidth() / 2 - numTiles * tileColumnOffset / 2) + camera.getOffsetX() * camera.getZoom());
+        origin.y = (int)((getHeight() / 2) + camera.getOffsetY() * camera.getZoom());
 
         int mouseX = mouseInput.x - tileColumnOffset / 2 - origin.x;
         int mouseY = mouseInput.y - tileRowOffset / 2 - origin.y;
@@ -129,8 +129,8 @@ public class Display extends JPanel {
     private void drawObject(int x, int y, int heightOffset, BufferedImage image) { drawImage(x, y, heightOffset, image); }
 
     private void drawImage(int x, int y, int heightOffset, BufferedImage image) {
-        int offX = x * tileColumnOffset / 2 + y * tileColumnOffset / 2 + origin.x;
-        int offY = y * tileRowOffset / 2 - x * tileRowOffset / 2 + origin.y;
+        int offX = (x * tileColumnOffset / 2  + y * tileColumnOffset / 2) + origin.x;
+        int offY = (y * tileRowOffset / 2 - x * tileRowOffset / 2) + origin.y;
 
         graphics.drawImage(image, offX, offY - (int) ((28 + heightOffset) * camera.getZoom()), (int) (image.getWidth() * camera.getZoom()), (int) (image.getHeight() * camera.getZoom()), null);
     }
@@ -214,7 +214,7 @@ public class Display extends JPanel {
 
         try {
             scriptLoader = new ScriptLoader();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) { }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException e) { }
 
         new Timer(1000 / 60, (ActionEvent e) -> {
             if(scriptLoader != null) {
