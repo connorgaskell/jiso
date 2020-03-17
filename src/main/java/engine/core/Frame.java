@@ -13,12 +13,12 @@ public class Frame extends JFrame {
         setTitle("JISO - Java Isometric Game Engine");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        setVisible(true);
         setMinimumSize(new Dimension(800, 600));
         setLocationRelativeTo(null);
+        setVisible(true);
 
         getContentPane().add(display, BorderLayout.CENTER);
-        addKeyListener(new KeyInput(display.camera));
+        addKeyListener(new KeyInput(display.getCamera()));
     }
 
 }

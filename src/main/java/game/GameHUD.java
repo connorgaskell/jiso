@@ -5,6 +5,7 @@ import engine.ui.Anchor;
 import engine.ui.Button;
 import engine.ui.Label;
 import engine.ui.UI;
+import engine.vector.Vector2;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -13,13 +14,11 @@ import java.io.IOException;
 
 public class GameHUD extends IsoScript {
 
-    private UI ui;
+    private UI ui = defaultUI();
     BufferedImage menuImage;
 
     @Override
     public void onStart() {
-        ui = defaultUI();
-
         try {
             menuImage = ImageIO.read(this.getClass().getResource("../Images/TestImage.png"));
         } catch (IOException e) { }
@@ -37,13 +36,21 @@ public class GameHUD extends IsoScript {
         Button button1 = button(ui, image1, Anchor.CENTER_RIGHT);
         button1.setOffset(-0.5f, 0);
         button1.getButton().addActionListener(e -> {
-            label1.setText("Hello, hello, hello, hello, hello, hello, hello, hello!");
+            hideLabel(ui, label1);
         });
+
+        System.out.println(ui);
+        Label versionLabel = label(getUI(), "Game - Version 0.0.1", 12.0f, Color.WHITE, Anchor.BOTTOM_LEFT);
+        versionLabel.padding = new Vector2(5, 5);
     }
 
     @Override
     public void onDrawFrame() {
         ui.renderUI();
+    }
+
+    public UI getUI() {
+        return ui;
     }
 
 }

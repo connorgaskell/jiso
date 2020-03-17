@@ -11,11 +11,22 @@ import engine.vector.Vector2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.stream.Collectors;
 
 public abstract class IsoScript {
 
+    private String scriptName;
+
     public Display getDisplay() {
         return Main.display;
+    }
+
+    public String getScriptName() {
+        return scriptName;
+    }
+
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     public Vector2 getMouseWorldPosition() {
@@ -30,6 +41,13 @@ public abstract class IsoScript {
 
     }
 
+    public IsoScript getScript(String name) {
+        try {
+            return getDisplay().getScripts().stream().filter(var -> var.getScriptName() == name).collect(Collectors.toList()).get(0);
+        } catch(NullPointerException e) { }
+        return null;
+    }
+
     public UI defaultUI() {
         return new UI(Main.display);
     }
@@ -42,6 +60,10 @@ public abstract class IsoScript {
 
     public void showLabel(UI ui, Label label) {
         ui.addLabel(label);
+    }
+
+    public void hideLabel(UI ui, Label label) {
+        ((Label)ui.getLabels().get(ui.getLabels().indexOf(label))).jComponent.setVisible(false);
     }
 
     public Image image(UI ui, BufferedImage image) {

@@ -3,9 +3,8 @@ package engine.script;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class ScriptLoader {
 
@@ -14,9 +13,18 @@ public class ScriptLoader {
     public ScriptLoader() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         for(int i = 0; i < getClasses("game").length; i++) {
             IsoScript script = (IsoScript) Class.forName(getClasses("game")[i].getName()).newInstance();
-            script.onStart();
+            script.setScriptName(getClasses("game")[i].getName());
             loadedScripts.add(script);
         }
+    }
+
+    public void startScripts() {
+        loadedScripts.parallelStream().forEach((script) -> {
+            //script.onStart();
+        });
+
+        //Collections.reverse(loadedScripts);
+        IntStream.range(0, loadedScripts.size()).forEach(i -> loadedScripts.get(i).onStart());
     }
 
     public ArrayList<IsoScript> getLoadedScripts() {

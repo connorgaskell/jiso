@@ -36,13 +36,13 @@ public class MouseInput implements MouseListener, MouseWheelListener, MouseMotio
             dragStart.y = e.getY();
         }
 
-        if(e.getButton() == MouseEvent.BUTTON1) {
+        /*if(e.getButton() == MouseEvent.BUTTON1) {
             display.addTile(display.selectedTile.x, display.selectedTile.y);
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
             display.addObject(display.selectedTile.x, display.selectedTile.y);
-        }
+        }*/
     }
 
     @Override
