@@ -2,6 +2,7 @@ package engine.script;
 
 import engine.Main;
 import engine.core.Display;
+import engine.objects.Camera;
 import engine.ui.Anchor;
 import engine.ui.Image;
 import engine.ui.Label;
@@ -10,6 +11,9 @@ import engine.ui.UI;
 import engine.vector.Vector2;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.stream.Collectors;
 
@@ -52,6 +56,10 @@ public abstract class IsoScript {
         return new UI(Main.display);
     }
 
+    public Camera defaultCamera() {
+        return new Camera(32);
+    }
+
     public Label label(UI ui, String text, float fontSize, Color color, Anchor anchor) {
         Label tempLabel = new Label(text, Main.display.getMainFont(), fontSize, color, anchor, new Vector2(0, 0), "");
         ui.addLabel(tempLabel);
@@ -84,6 +92,19 @@ public abstract class IsoScript {
     public void showButton(UI ui, Button button) {
         ui.addButton(button);
     }
+
+    public void onMouseClicked(MouseEvent e) { }
+    public void onMousePressed(MouseEvent e) { }
+    public void onMouseReleased(MouseEvent e) { }
+    public void onMouseEntered(MouseEvent e) { }
+    public void onMouseExit(MouseEvent e) { }
+    public void onMouseWheelMoved(MouseWheelEvent e) { }
+    public void onMouseDragged(MouseEvent e) { }
+    public void onMouseMoved(MouseEvent e) { }
+
+    public void onKeyTyped(KeyEvent e) { }
+    public void onKeyPressed(KeyEvent e) { }
+    public void onKeyReleased(KeyEvent e) { }
 
     public abstract void onStart();
     public abstract void onDrawFrame();

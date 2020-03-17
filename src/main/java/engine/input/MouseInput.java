@@ -5,84 +5,53 @@ import engine.objects.Camera;
 import engine.vector.Vector2;
 
 import java.awt.event.*;
+import java.util.stream.IntStream;
 
 public class MouseInput implements MouseListener, MouseWheelListener, MouseMotionListener {
 
     private Display display;
-    private Camera camera;
 
-    public int x;
-    public int y;
-
-    private Vector2 dragStart = new Vector2();
-    public Vector2 dragDistance = new Vector2();
-    private boolean middleMouseDown = false;
-
-    public MouseInput(Display display, Camera camera) {
+    public MouseInput(Display display) {
         this.display = display;
-        this.camera = camera;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseClicked(e));
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON2) {
-            middleMouseDown = true;
-            dragStart.x = e.getX();
-            dragStart.y = e.getY();
-        }
-
-        /*if(e.getButton() == MouseEvent.BUTTON1) {
-            display.addTile(display.selectedTile.x, display.selectedTile.y);
-        }
-
-        if(e.getButton() == MouseEvent.BUTTON3) {
-            display.addObject(display.selectedTile.x, display.selectedTile.y);
-        }*/
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMousePressed(e));
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON2) {
-            middleMouseDown = false;
-            dragDistance.x = 0;
-            dragDistance.y = 0;
-        }
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseReleased(e));
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseEntered(e));
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseExit(e));
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        camera.setZoom(-e.getWheelRotation());
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseWheelMoved(e));
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(middleMouseDown) {
-            dragDistance.x = (dragStart.x - e.getX()) / 50;
-            dragDistance.y = (dragStart.y - e.getY()) / 50;
-        }
-
-        x = e.getX();
-        y = e.getY();
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseDragged(e));
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        x = e.getX();
-        y = e.getY();
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onMouseMoved(e));
     }
 }

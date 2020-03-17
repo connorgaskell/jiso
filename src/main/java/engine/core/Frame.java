@@ -18,7 +18,7 @@ public class Frame extends JFrame {
         setVisible(true);
 
         getContentPane().add(display, BorderLayout.CENTER);
-        addKeyListener(new KeyInput(display.getCamera()));
+        addKeyListener(new KeyInput(display));
     }
 
 }

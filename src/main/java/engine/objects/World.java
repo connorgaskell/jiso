@@ -16,11 +16,13 @@ public class World {
     private int numTiles = 32;
 
     private Display display;
+    private Camera camera;
 
     private ArrayList<Tile> tiles = new ArrayList<>();
 
-    public World(Display display) {
+    public World(Display display, Camera camera) {
         this.display = display;
+        this.camera = camera;
     }
 
     public void addTile(int x, int y, BufferedImage image) {
@@ -47,20 +49,20 @@ public class World {
         tiles.sort(Comparator.comparingInt(Tile::getY));
     }
 
-    public Vector2 getSelectedTile() {
-        int mouseX = display.getMouseInput().x - getTileOffset().x / 2 - getOrigin().x;
-        int mouseY = display.getMouseInput().y - getTileOffset().y / 2 - getOrigin().y;
+    public Vector2 getSelectedTile(Vector2 mousePosition) {
+        int mouseX = mousePosition.x - getTileOffset().x / 2 - getOrigin().x;
+        int mouseY = mousePosition.y - getTileOffset().y / 2 - getOrigin().y;
 
         return new Vector2(-(int)Math.round((mouseY - mouseX * 0.5) / getTileOffset().y), (int)Math.round((mouseY + mouseX * 0.5) / getTileOffset().y));
     }
 
     public Vector2 getTileOffset() {
-        return new Vector2((int)(64 * display.getCamera().getZoom()), (int)(64 * display.getCamera().getZoom()) / 2);
+        return new Vector2((int)(64 * camera.getZoom()), (int)(64 * camera.getZoom()) / 2);
     }
 
     public Vector2 getOrigin() {
-        origin.x = display.getWidth() / 2 - numTiles * getTileOffset().x / 2 + (int)Math.floor(display.getCamera().getOffsetX() * display.getCamera().getZoom());
-        origin.y = (display.getHeight() / 2) + (int)Math.floor(display.getCamera().getOffsetY() * display.getCamera().getZoom());
+        origin.x = display.getWidth() / 2 - numTiles * getTileOffset().x / 2 + (int)Math.floor(camera.getOffsetX() * camera.getZoom());
+        origin.y = (display.getHeight() / 2) + (int)Math.floor(camera.getOffsetY() * camera.getZoom());
         return origin;
     }
 
@@ -80,7 +82,7 @@ public class World {
         int offX = (x * getTileOffset().x / 2  + y * getTileOffset().x / 2) + getOrigin().x;
         int offY = (y * getTileOffset().y / 2 - x * getTileOffset().y / 2) + getOrigin().y;
 
-        Main.display.graphics.drawImage(image, offX, offY - (int) ((28 + heightOffset) * display.getCamera().getZoom()), (int) (image.getWidth() * display.getCamera().getZoom()), (int) (image.getHeight() * display.getCamera().getZoom()), null);
+        Main.display.graphics.drawImage(image, offX, offY - (int) ((28 + heightOffset) * camera.getZoom()), (int) (image.getWidth() * camera.getZoom()), (int) (image.getHeight() * camera.getZoom()), null);
     }
 
     public void drawGrid(int x, int y, Color color) {

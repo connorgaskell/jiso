@@ -5,45 +5,28 @@ import engine.objects.Camera;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.stream.IntStream;
 
 public class KeyInput implements KeyListener {
 
-    private Camera camera;
+    private Display display;
 
-    public KeyInput(Camera camera) {
-        this.camera = camera;
+    public KeyInput(Display display) {
+        this.display = display;
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onKeyTyped(e));
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch(e.getKeyCode()) {
-            case KeyEvent.VK_UP:
-            case KeyEvent.VK_W:
-                camera.setOffset(0.0f, 5.0f);
-                break;
-            case KeyEvent.VK_DOWN:
-            case KeyEvent.VK_S:
-                camera.setOffset(-0.0f, -5.0f);
-                break;
-            case KeyEvent.VK_LEFT:
-            case KeyEvent.VK_A:
-                camera.setOffset(5.0f, 0.0f);
-                break;
-            case KeyEvent.VK_RIGHT:
-            case KeyEvent.VK_D:
-                camera.setOffset(-5.0f, 0.0f);
-                break;
-        }
-        //display.repaint();
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onKeyPressed(e));
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        IntStream.range(0, display.getScripts().size()).forEach(i -> display.getScripts().get(i).onKeyReleased(e));
     }
 }

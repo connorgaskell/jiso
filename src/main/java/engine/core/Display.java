@@ -20,9 +20,6 @@ public class Display extends JPanel {
     public Graphics2D graphics;
     public Vector2 selectedTile = new Vector2();
 
-    private int numTiles = 32;
-    private Camera camera = new Camera(numTiles);
-
     private boolean displayCreated = false;
 
     private MouseInput mouseInput;
@@ -31,11 +28,7 @@ public class Display extends JPanel {
     private Font mainFont;
 
     public Display() {
-        mouseInput = new MouseInput(this, camera);
-
-        addMouseListener(mouseInput);
-        addMouseMotionListener(mouseInput);
-        addMouseWheelListener(mouseInput);
+        mouseInput = new MouseInput(this);
 
         setLayout(null);
         setDoubleBuffered(true);
@@ -58,14 +51,6 @@ public class Display extends JPanel {
         return mainFont;
     }
 
-    public MouseInput getMouseInput() {
-        return mouseInput;
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
     public ArrayList<IsoScript> getScripts() {
         return scriptLoader.getLoadedScripts();
     }
@@ -74,8 +59,6 @@ public class Display extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
         this.graphics = g2d;
-
-        camera.dragOffset(mouseInput.dragDistance.x, mouseInput.dragDistance.y, 2.0f);
 
         if(!displayCreated) {
             startApplication();
@@ -102,11 +85,13 @@ public class Display extends JPanel {
             scriptLoader = new ScriptLoader();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException e) { }
 
-        new Timer(1000 / 60, (ActionEvent e) -> {
-            repaint();
-        }).start();
+        new Timer(1000 / 60, (ActionEvent e) -> repaint()).start();
 
         scriptLoader.startScripts();
+
+        addMouseListener(mouseInput);
+        addMouseMotionListener(mouseInput);
+        addMouseWheelListener(mouseInput);
     }
 
 }
