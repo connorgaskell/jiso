@@ -3,6 +3,7 @@ package engine.script;
 import engine.Main;
 import engine.core.Display;
 import engine.objects.Camera;
+import engine.objects.World;
 import engine.ui.Anchor;
 import engine.ui.Image;
 import engine.ui.Label;
@@ -43,6 +44,10 @@ public abstract class IsoScript {
 
     public void displayTileGrid(boolean display) {
 
+    }
+
+    public boolean isInWorldBounds(World world, Vector2 mousePosition) {
+        return (world.getSelectedTile(mousePosition).x >= 0 && world.getSelectedTile(mousePosition).x < world.getNumTiles() && world.getSelectedTile(mousePosition).y >= 0 && world.getSelectedTile(mousePosition).y < world.getNumTiles());
     }
 
     public IsoScript getScript(String name) {

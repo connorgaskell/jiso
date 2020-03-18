@@ -11,20 +11,53 @@ public class UIComponent {
 
     public String name;
     public Vector2 position;
+    private Vector2 origin;
     public Vector2 padding;
     public float offsetX, offsetY;
+    private float originOffsetX, originOffsetY;
     public JComponent jComponent;
 
     public UIComponent(String name, Vector2 position) {
         this.position = position;
+        this.origin = position;
         padding = new Vector2(0, 0);
         offsetX = 0;
         offsetY = 0;
     }
 
+    public Vector2 getOrigin() {
+        return origin;
+    }
+
     public void setOffset(float x, float y) {
         offsetX = x;
         offsetY = y;
+        originOffsetX = x;
+        originOffsetY = y;
+    }
+
+    public void addOffset(float x, float y) {
+        offsetX += x;
+        offsetY += y;
+    }
+
+    public void addOffsetToOrigin(float x, float y) {
+        offsetX = origin.x + x;
+        offsetY = origin.y + y;
+    }
+
+    public void resetOffset() {
+        offsetX = originOffsetX;
+        offsetY = originOffsetY;
+    }
+
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
     }
 
     public void destroyComponent(ArrayList<UIComponent> components) {

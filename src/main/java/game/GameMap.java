@@ -10,7 +10,6 @@ import engine.vector.Vector2;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -50,7 +49,7 @@ public class GameMap extends IsoScript {
                 world.drawFloor(world.getTiles().get(i).getX(), world.getTiles().get(i).getY(), world.getTiles().get(i).getImage());
             }
 
-            if(world.getSelectedTile(mousePosition).x >= 0 && world.getSelectedTile(mousePosition).x < world.getNumTiles() && world.getSelectedTile(mousePosition).y >= 0 && world.getSelectedTile(mousePosition).y < world.getNumTiles())
+            if(isInWorldBounds(world, mousePosition))
                 world.drawImage(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, 4, highlightImage);
 
             for (int i = 0; i < world.getTiles().size(); i++) {
@@ -61,19 +60,16 @@ public class GameMap extends IsoScript {
         } catch (Exception e) { }
     }
 
-
     @Override
     public void onMousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1) {
+        if(e.getButton() == MouseEvent.BUTTON1 && isInWorldBounds(world, mousePosition)) {
             world.addTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, floorImage);
         }
 
-        if(e.getButton() == MouseEvent.BUTTON3) {
+        if(e.getButton() == MouseEvent.BUTTON3 && isInWorldBounds(world, mousePosition)) {
             boolean success = world.addObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, objectImage);
             if(!success) {
-                String message = "You cannot place an object here!";
-                System.out.println(message);
-                Label label = label(ui, message, 14.0f, Color.WHITE, Anchor.TOP_LEFT);
+                Label label = label(ui, "You cannot place an object here!", 14.0f, Color.WHITE, Anchor.TOP_LEFT);
                 label.destroyComponentAfterTime(ui.getLabels(),1000);
             }
         }

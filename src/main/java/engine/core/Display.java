@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 public class Display extends JPanel {
@@ -65,6 +66,7 @@ public class Display extends JPanel {
             displayCreated = true;
         }
 
+        //Collections.reverse(scriptLoader.getLoadedScripts());
         IntStream.range(0, scriptLoader.getLoadedScripts().size()).forEach(i -> scriptLoader.getLoadedScripts().get(i).onDrawFrame());
 
         /*for(int i = 0; i < ui.getImages().size(); i++) {

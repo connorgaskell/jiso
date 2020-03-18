@@ -4,6 +4,9 @@ import engine.Main;
 import engine.vector.Vector2;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Button extends UIComponent {
 
@@ -27,7 +30,10 @@ public class Button extends UIComponent {
 
         this.button.setLayout(null);
         this.button.setBounds(this.position.x, this.position.y, image.getSize().x, image.getSize().y);
-        this.button.setIcon(new ImageIcon(image.getImage()));
+
+        java.awt.Image scaledImage = image.getImage().getScaledInstance(size.x, size.y, java.awt.Image.SCALE_SMOOTH);
+        this.button.setIcon(new ImageIcon(scaledImage));
+
         this.button.setBorder(null);
         this.button.setBackground(null);
         this.button.setFocusPainted(false);
@@ -63,8 +69,21 @@ public class Button extends UIComponent {
         return button;
     }
 
+    public Vector2 getPosition() {
+        return new Vector2(button.getLocation().x, button.getLocation().y);
+    }
+
     public void setPosition() {
         button.setLocation(this.position.x, this.position.y);
+    }
+
+    public void setMouseActionEvent(ChangeEvent e, Button btn, float yOffset) {
+        ButtonModel model =  ((JButton) e.getSource()).getModel();
+        if (model.isRollover() && !model.isPressed()) {
+            btn.addOffset(0, -yOffset);
+        } else if(!model.isRollover() || model.isPressed()) {
+            btn.resetOffset();
+        }
     }
 
 }

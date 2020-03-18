@@ -39,6 +39,10 @@ public class GameHUD extends IsoScript {
             hideLabel(ui, label1);
         });
 
+        button1.getButton().addChangeListener(e -> {
+            button1.setMouseActionEvent(e, button1, 0.025f);
+        });
+
         System.out.println(ui);
         Label versionLabel = label(getUI(), "Game - Version 0.0.1", 12.0f, Color.WHITE, Anchor.BOTTOM_LEFT);
         versionLabel.padding = new Vector2(5, 5);
