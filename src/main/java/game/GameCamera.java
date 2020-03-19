@@ -2,6 +2,7 @@ package game;
 
 import engine.objects.Camera;
 import engine.script.IsoScript;
+import engine.ui.UI;
 import engine.vector.Vector2;
 
 import java.awt.event.*;
@@ -19,7 +20,8 @@ public class GameCamera extends IsoScript {
 
     @Override
     public void onStart() {
-
+        GameMap gameMap = ((GameMap)getScript("game.GameMap"));
+        camera.setOffset(gameMap.getWorld().getNumTiles() * 22f,0);
     }
 
     @Override
@@ -92,4 +94,5 @@ public class GameCamera extends IsoScript {
                 break;
         }
     }
+
 }

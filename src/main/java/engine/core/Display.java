@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.stream.IntStream;
 
 public class Display extends JPanel {
@@ -89,7 +88,7 @@ public class Display extends JPanel {
 
         new Timer(1000 / 60, (ActionEvent e) -> repaint()).start();
 
-        scriptLoader.startScripts();
+        scriptLoader.startScripts(scriptLoader.getLoadedScripts());
 
         addMouseListener(mouseInput);
         addMouseMotionListener(mouseInput);

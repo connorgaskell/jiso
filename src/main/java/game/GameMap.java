@@ -1,5 +1,6 @@
 package game;
 
+import engine.objects.Camera;
 import engine.objects.World;
 import engine.script.IsoScript;
 import engine.ui.Anchor;
@@ -85,6 +86,10 @@ public class GameMap extends IsoScript {
     public void onMouseDragged(MouseEvent e) {
         mousePosition.x = e.getX();
         mousePosition.y = e.getY();
+    }
+
+    public World getWorld() {
+        return world;
     }
 
 }

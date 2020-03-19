@@ -18,13 +18,24 @@ public class ScriptLoader {
         }
     }
 
-    public void startScripts() {
-        loadedScripts.parallelStream().forEach((script) -> {
-            //script.onStart();
-        });
+    public void startScripts(ArrayList<IsoScript> scripts) {
+        // Clone the passed ArrayList into a temporary ArrayList.
+        ArrayList<IsoScript> tempScripts = (ArrayList<IsoScript>)scripts.clone();
 
-        //Collections.reverse(loadedScripts);
-        IntStream.range(0, loadedScripts.size()).forEach(i -> loadedScripts.get(i).onStart());
+        try {
+            // Iterate through the ArrayList and call the onStart() method of each IsoScript, if successful this element can be removed from the ArrayList.
+            IntStream.range(0, tempScripts.size()).forEach(i -> {
+                scripts.get(i).onStart();
+                tempScripts.remove(0);
+            });
+        } catch(NullPointerException e) { }
+
+        // The forEach will end if there is a NullPointerException or when complete, if an Exception is thrown then tempScripts will still have some elements.
+        if(tempScripts.size() > 0) {
+            // Reorder the elements in the ArrayList and call this method again to retry.
+            Collections.rotate(tempScripts, -1);
+            startScripts(tempScripts);
+        }
     }
 
     public ArrayList<IsoScript> getLoadedScripts() {
