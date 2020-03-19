@@ -15,6 +15,7 @@ public class UIComponent {
     public Vector2 padding;
     public float offsetX, offsetY;
     private float originOffsetX, originOffsetY;
+    public boolean isHidden = false;
     public JComponent jComponent;
 
     public UIComponent(String name, Vector2 position) {

@@ -40,7 +40,11 @@ public class World {
         }
     }
 
-    private Tile getTile(int x, int y) {
+    public boolean isTileNear(Vector2 pos) {
+        return tiles.stream().filter(var -> (var.getX() == pos.x - 1 && var.getY() == pos.y) || (var.getX() == pos.x && var.getY() == pos.y - 1) || (var.getX() == pos.x + 1 && var.getY() == pos.y) || (var.getX() == pos.x && var.getY() == pos.y + 1)).collect(Collectors.toList()).size() > 0;
+    }
+
+    public Tile getTile(int x, int y) {
         return tiles.stream().filter(var -> var.getX() == x && var.getY() == y).collect(Collectors.toList()).get(0);
     }
 

@@ -38,14 +38,6 @@ public abstract class IsoScript {
         return new Vector2(Main.display.selectedTile.x, Main.display.selectedTile.y);
     }
 
-    public void addGroundTile() {
-
-    }
-
-    public void displayTileGrid(boolean display) {
-
-    }
-
     public boolean isInWorldBounds(World world, Vector2 mousePosition) {
         return (world.getSelectedTile(mousePosition).x >= 0 && world.getSelectedTile(mousePosition).x < world.getNumTiles() && world.getSelectedTile(mousePosition).y >= 0 && world.getSelectedTile(mousePosition).y < world.getNumTiles());
     }
@@ -72,7 +64,7 @@ public abstract class IsoScript {
     }
 
     public void showLabel(UI ui, Label label) {
-        ui.addLabel(label);
+        ((Label)ui.getLabels().get(ui.getLabels().indexOf(label))).jComponent.setVisible(true);
     }
 
     public void hideLabel(UI ui, Label label) {

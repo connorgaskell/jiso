@@ -17,7 +17,7 @@ import java.io.IOException;
 public class GameMap extends IsoScript {
 
     private World world;
-    private BufferedImage objectImage, floorImage, highlightImage;
+    private BufferedImage objectImage, floorImage, highlightImage, highlightImageRed;
     private UI ui;
     private Vector2 mousePosition = new Vector2();
 
@@ -27,6 +27,7 @@ public class GameMap extends IsoScript {
             objectImage = ImageIO.read(this.getClass().getResource("../Images/TileObject.png"));
             floorImage = ImageIO.read(this.getClass().getResource("../Images/FloorTile.png"));
             highlightImage = ImageIO.read(this.getClass().getResource("../Images/HighlightTile.png"));
+            highlightImageRed = ImageIO.read(this.getClass().getResource("../Images/HighlightTileRed.png"));
         } catch (IOException e) { }
 
         world = new World(getDisplay(), ((GameCamera)getScript("game.GameCamera")).getCamera());
@@ -50,8 +51,9 @@ public class GameMap extends IsoScript {
                 world.drawFloor(world.getTiles().get(i).getX(), world.getTiles().get(i).getY(), world.getTiles().get(i).getImage());
             }
 
-            if(isInWorldBounds(world, mousePosition))
-                world.drawImage(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, 4, highlightImage);
+            if(isInWorldBounds(world, mousePosition)) {
+                world.drawImage(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, 4, world.isTileNear(world.getSelectedTile(mousePosition)) ? highlightImage : highlightImageRed);
+            }
 
             for (int i = 0; i < world.getTiles().size(); i++) {
                 for (int j = 0; j < world.getTiles().get(i).getGameObjects().size(); j++) {
@@ -63,8 +65,11 @@ public class GameMap extends IsoScript {
 
     @Override
     public void onMousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1 && isInWorldBounds(world, mousePosition)) {
+        if(e.getButton() == MouseEvent.BUTTON1 && isInWorldBounds(world, mousePosition) && world.isTileNear(world.getSelectedTile(mousePosition))) {
             world.addTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, floorImage);
+        } else {
+            Label label = label(ui, "You cannot place a tile here!", 14.0f, Color.WHITE, Anchor.TOP_LEFT);
+            label.destroyComponentAfterTime(ui.getLabels(),1000);
         }
 
         if(e.getButton() == MouseEvent.BUTTON3 && isInWorldBounds(world, mousePosition)) {
