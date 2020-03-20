@@ -1,5 +1,6 @@
 package engine.core;
 
+import engine.input.KeyInput;
 import engine.input.MouseInput;
 import engine.objects.Camera;
 import engine.script.IsoScript;
@@ -30,6 +31,8 @@ public class Display extends JPanel {
     public Display() {
         mouseInput = new MouseInput(this);
 
+        setFocusable(true);
+        requestFocus();
         setLayout(null);
         setDoubleBuffered(true);
         setBackground(Color.darkGray);
@@ -93,6 +96,7 @@ public class Display extends JPanel {
         addMouseListener(mouseInput);
         addMouseMotionListener(mouseInput);
         addMouseWheelListener(mouseInput);
+        addKeyListener(new KeyInput(this));
     }
 
 }

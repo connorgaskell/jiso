@@ -1,6 +1,5 @@
 package game;
 
-import engine.objects.Camera;
 import engine.objects.World;
 import engine.script.IsoScript;
 import engine.ui.Anchor;
@@ -10,6 +9,7 @@ import engine.vector.Vector2;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -20,6 +20,7 @@ public class GameMap extends IsoScript {
     private BufferedImage objectImage, floorImage, highlightImage, highlightImageRed;
     private UI ui;
     private Vector2 mousePosition = new Vector2();
+    private boolean isShiftDown = false;
 
     @Override
     public void onStart() {
@@ -65,20 +66,39 @@ public class GameMap extends IsoScript {
 
     @Override
     public void onMousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1 && isInWorldBounds(world, mousePosition) && world.isTileNear(world.getSelectedTile(mousePosition))) {
-            world.addTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, floorImage);
-        } else {
-            Label label = label(ui, "You cannot place a tile here!", 14.0f, Color.WHITE, Anchor.TOP_LEFT);
-            label.destroyComponentAfterTime(ui.getLabels(),1000);
-        }
+        switch(e.getButton()) {
+            case MouseEvent.BUTTON1:
+                if(isShiftDown && world.getTiles().size() >= 10) {
+                    world.removeTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y);
+                } else if(isShiftDown) {
+                    displayTemporaryLabel("You already have the minimum number of tiles in your world!", 1000);
+                }
 
-        if(e.getButton() == MouseEvent.BUTTON3 && isInWorldBounds(world, mousePosition)) {
-            boolean success = world.addObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, objectImage);
-            if(!success) {
-                Label label = label(ui, "You cannot place an object here!", 14.0f, Color.WHITE, Anchor.TOP_LEFT);
-                label.destroyComponentAfterTime(ui.getLabels(),1000);
-            }
+                if(!isShiftDown && isInWorldBounds(world, mousePosition) && world.isTileNear(world.getSelectedTile(mousePosition))) {
+                    world.addTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, floorImage);
+                } else {
+                    displayTemporaryLabel("You cannot place a tile here!", 1000);
+                }
+                break;
+
+            case MouseEvent.BUTTON3:
+                if(isInWorldBounds(world, mousePosition)) {
+                    boolean success = world.addObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, objectImage);
+                    if(!success) {
+                        displayTemporaryLabel("You cannot place an object here!", 1000);
+                    }
+                } else {
+                    displayTemporaryLabel("You cannot place an object here!", 1000);
+                }
+                break;
         }
+    }
+
+    public void displayTemporaryLabel(String message, int time) {
+        ((GameHUD)getScript("game.GameHUD")).destroyAllComponentsWithName(ui.getLabels(), "TempLabel");
+        Label label = label(ui, message, 14.0f, Color.WHITE, Anchor.TOP_LEFT);
+        label.setName("TempLabel");
+        label.destroyComponentAfterTime(ui.getLabels(), time);
     }
 
     @Override
@@ -91,6 +111,20 @@ public class GameMap extends IsoScript {
     public void onMouseDragged(MouseEvent e) {
         mousePosition.x = e.getX();
         mousePosition.y = e.getY();
+    }
+
+    @Override
+    public void onKeyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            isShiftDown = true;
+        }
+    }
+
+    @Override
+    public void onKeyReleased(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            isShiftDown = false;
+        }
     }
 
     public World getWorld() {

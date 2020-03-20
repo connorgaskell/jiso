@@ -8,7 +8,6 @@ import java.awt.*;
 
 public class Label extends UIComponent {
 
-    private String name;
     private String text;
     private Font font;
     private float size;
@@ -44,12 +43,6 @@ public class Label extends UIComponent {
         Main.display.add(this.label);
     }
 
-    public void setText(String text) {
-        this.text = text;
-        this.label.setText(text);
-        this.label.setSize((int)label.getPreferredSize().getWidth(), (int)size);
-    }
-
     public String getText() {
         return text;
     }
@@ -76,6 +69,16 @@ public class Label extends UIComponent {
 
     public Anchor getAnchor() {
         return anchor;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        this.label.setText(text);
+        this.label.setSize((int)label.getPreferredSize().getWidth(), (int)size);
     }
 
     public void setPosition() {

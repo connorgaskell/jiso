@@ -62,9 +62,11 @@ public class UIComponent {
     }
 
     public void destroyComponent(ArrayList<UIComponent> components) {
-        Container parent = components.get(components.indexOf(this)).jComponent.getParent();
-        parent.remove(components.get(components.indexOf(this)).jComponent);
-        components.remove(this);
+        try {
+            Container parent = components.get(components.indexOf(this)).jComponent.getParent();
+            parent.remove(components.get(components.indexOf(this)).jComponent);
+            components.remove(this);
+        } catch(IndexOutOfBoundsException e) { }
     }
 
     public void destroyComponentAfterTime(ArrayList<UIComponent> components, int time) {
@@ -117,6 +119,10 @@ public class UIComponent {
 
         position.x += (int)(offsetX * originalWidth);
         position.y += (int)(offsetY * originalHeight);
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

@@ -1,16 +1,18 @@
 package game;
 
 import engine.script.IsoScript;
-import engine.ui.Anchor;
+import engine.ui.*;
 import engine.ui.Button;
 import engine.ui.Label;
-import engine.ui.UI;
 import engine.vector.Vector2;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GameHUD extends IsoScript {
 
@@ -44,6 +46,15 @@ public class GameHUD extends IsoScript {
     @Override
     public void onDrawFrame() {
         ui.renderUI();
+    }
+
+    public void destroyAllComponentsWithName(ArrayList<UIComponent> components, String name) {
+        ArrayList<UIComponent> componentsToDestroy = getUIComponentsByName(components, name);
+        IntStream.range(0, componentsToDestroy.size()).forEach(i -> componentsToDestroy.get(i).destroyComponent(components));
+    }
+
+    public ArrayList<UIComponent> getUIComponentsByName(ArrayList<UIComponent> components, String name) {
+        return (ArrayList<UIComponent>) components.stream().filter(var -> var.getName() == name).collect(Collectors.toList());
     }
 
     public UI getUI() {

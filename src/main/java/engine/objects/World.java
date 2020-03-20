@@ -8,7 +8,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class World {
 
@@ -27,6 +29,21 @@ public class World {
 
     public void addTile(int x, int y, BufferedImage image) {
         tiles.add(new Tile(x, y, image));
+        sortTiles();
+    }
+
+    public void removeTile(int x, int y) {
+        try {
+            tiles.remove(getTile(x, y));
+            //IntStream.range(0, tiles.size()).filter(i -> !isTileNear(new Vector2(tiles.get(i).getX(), tiles.get(i).getY()))).forEach(i -> tiles.remove(tiles.get(i)));
+
+            for(int i = 0; i < tiles.size(); i++) {
+                if(!isTileNear(new Vector2(tiles.get(i).getX(), tiles.get(i).getY()))) {
+                    tiles.remove(tiles.get(i));
+                }
+            }
+
+        } catch (IndexOutOfBoundsException e) { }
         sortTiles();
     }
 

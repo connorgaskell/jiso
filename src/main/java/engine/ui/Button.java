@@ -27,6 +27,7 @@ public class Button extends UIComponent {
 
         image.position = this.position;
         this.jComponent = this.button;
+        this.jComponent.setFocusable(false);
 
         this.button.setLayout(null);
         this.button.setBounds(this.position.x, this.position.y, image.getSize().x, image.getSize().y);
