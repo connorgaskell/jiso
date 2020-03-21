@@ -1,7 +1,5 @@
 package engine.core;
 
-import engine.input.KeyInput;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -18,7 +16,6 @@ public class Frame extends JFrame {
         setVisible(true);
 
         getContentPane().add(display, BorderLayout.CENTER);
-        //addKeyListener(new KeyInput(display));
     }
 
 }

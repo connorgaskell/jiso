@@ -2,7 +2,6 @@ package engine.core;
 
 import engine.input.KeyInput;
 import engine.input.MouseInput;
-import engine.objects.Camera;
 import engine.script.IsoScript;
 import engine.script.ScriptLoader;
 import engine.vector.Vector2;
@@ -63,12 +62,11 @@ public class Display extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         this.graphics = g2d;
 
-        if(!displayCreated) {
+        if (!displayCreated) {
             startApplication();
             displayCreated = true;
         }
 
-        //Collections.reverse(scriptLoader.getLoadedScripts());
         IntStream.range(0, scriptLoader.getLoadedScripts().size()).forEach(i -> scriptLoader.getLoadedScripts().get(i).onDrawFrame());
 
         /*for(int i = 0; i < ui.getImages().size(); i++) {

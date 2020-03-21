@@ -2,6 +2,7 @@ package game;
 
 import engine.objects.World;
 import engine.script.IsoScript;
+import engine.sound.Sound;
 import engine.ui.Anchor;
 import engine.ui.Label;
 import engine.ui.UI;
@@ -21,6 +22,7 @@ public class GameMap extends IsoScript {
     private UI ui;
     private Vector2 mousePosition = new Vector2();
     private boolean isShiftDown = false;
+    private Sound ambientSound;
 
     @Override
     public void onStart() {
@@ -43,6 +45,13 @@ public class GameMap extends IsoScript {
         ui = ((GameHUD)getScript("game.GameHUD")).getUI();
         Label versionLabel = label(ui, "Game - Version 0.0.1", 12.0f, Color.WHITE, Anchor.BOTTOM_LEFT);
         versionLabel.padding = new Vector2(5, 5);
+
+        /*
+         * Create a new Sound object, currently the sound will automatically play.
+         * This is a temporary ambient sound example used for the project.
+         * Sound Credit: Despic Zeljko - zeljkodespic@gmail.com (https://www.youtube.com/watch?v=tgIrn0c7zGk)
+         */
+        ambientSound = new Sound("../../Sounds/Ambient/Farm.mp3");
     }
 
     @Override
