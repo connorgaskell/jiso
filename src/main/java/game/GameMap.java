@@ -52,6 +52,7 @@ public class GameMap extends IsoScript {
          * Sound Credit: Despic Zeljko - zeljkodespic@gmail.com (https://www.youtube.com/watch?v=tgIrn0c7zGk)
          */
         ambientSound = new Sound("../../Sounds/Ambient/Farm.mp3");
+        ambientSound.play();
     }
 
     @Override
@@ -77,6 +78,7 @@ public class GameMap extends IsoScript {
     public void onMousePressed(MouseEvent e) {
         switch(e.getButton()) {
             case MouseEvent.BUTTON1:
+                ambientSound.stop();
                 if(isShiftDown && world.getTiles().size() >= 10) {
                     world.removeTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y);
                 } else if(isShiftDown) {

@@ -1,6 +1,7 @@
 package game;
 
 import engine.script.IsoScript;
+import engine.sound.Sound;
 import engine.ui.*;
 import engine.ui.Button;
 import engine.ui.Label;
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,6 +20,7 @@ public class GameHUD extends IsoScript {
 
     private UI ui = defaultUI();
     BufferedImage menuImage;
+    private Sound clickSound;
 
     @Override
     public void onStart() {
@@ -31,8 +34,14 @@ public class GameHUD extends IsoScript {
         engine.ui.Image image1 = image(ui, menuImage);
         Button button1 = button(ui, image1, Anchor.CENTER_RIGHT);
         button1.setOffset(-0.5f, 0);
+
+        ArrayList<Sound> clickSounds = new ArrayList<>();
+        clickSounds.add(new Sound("../../Sounds/Effects/Click1.mp3"));
+        clickSounds.add(new Sound("../../Sounds/Effects/Click2.mp3"));
         button1.getButton().addActionListener(e -> {
             label1.addOffset(0, -0.1f);
+            clickSound = clickSounds.get(ThreadLocalRandom.current().nextInt(clickSounds.size()));
+            clickSound.play();
         });
 
         button1.getButton().addChangeListener(e -> {
