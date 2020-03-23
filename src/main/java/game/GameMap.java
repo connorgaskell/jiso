@@ -6,6 +6,7 @@ import engine.sound.Sound;
 import engine.ui.Anchor;
 import engine.ui.Label;
 import engine.ui.UI;
+import engine.util.HexColor;
 import engine.vector.Vector2;
 
 import javax.imageio.ImageIO;
@@ -14,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameMap extends IsoScript {
 
@@ -22,7 +24,7 @@ public class GameMap extends IsoScript {
     private UI ui;
     private Vector2 mousePosition = new Vector2();
     private boolean isShiftDown = false;
-    private Sound ambientSound;
+    private Sound ambientSound, breakSound;
 
     @Override
     public void onStart() {
@@ -72,14 +74,19 @@ public class GameMap extends IsoScript {
                 }
             }
         } catch (Exception e) { }
+        world.renderParticles();
     }
 
     @Override
     public void onMousePressed(MouseEvent e) {
         switch(e.getButton()) {
             case MouseEvent.BUTTON1:
-                ambientSound.stop();
                 if(isShiftDown && world.getTiles().size() >= 10) {
+                    if(world.getTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y) != null) {
+                        createParticles(world.tileToScreenPosition(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y).x, world.tileToScreenPosition(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y).y);
+                        breakSound = new Sound("../../Sounds/Effects/Break.mp3");
+                        breakSound.play();
+                    }
                     world.removeTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y);
                 } else if(isShiftDown) {
                     displayTemporaryLabel("You already have the minimum number of tiles in your world!", 1000);
@@ -110,6 +117,18 @@ public class GameMap extends IsoScript {
         Label label = label(ui, message, 14.0f, Color.WHITE, Anchor.TOP_LEFT);
         label.setName("TempLabel");
         label.destroyComponentAfterTime(ui.getLabels(), time);
+    }
+
+    private void createParticles(int x, int y) {
+        ArrayList<Color> colors = new ArrayList<>();
+        colors.add(new HexColor("#825B18", 255).color);
+        colors.add(new HexColor("#F1AE2C", 255).color);
+        colors.add(new HexColor("#B78122", 255).color);
+        colors.add(new HexColor("#459826", 255).color);
+        colors.add(new HexColor("#134D1D", 255).color);
+        for(int i = 0; i < 32; i++) {
+            world.drawParticle(x, y, colors);
+        }
     }
 
     @Override

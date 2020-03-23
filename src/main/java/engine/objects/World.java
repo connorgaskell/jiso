@@ -2,12 +2,14 @@ package engine.objects;
 
 import engine.Main;
 import engine.core.Display;
+import engine.particle.Particle;
 import engine.vector.Vector2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class World {
@@ -19,6 +21,7 @@ public class World {
     private Camera camera;
 
     private ArrayList<Tile> tiles = new ArrayList<>();
+    private ArrayList<Particle> particles = new ArrayList<>(500);
 
     public World(Display display, Camera camera) {
         this.display = display;
@@ -53,12 +56,22 @@ public class World {
     }
 
     public Tile getTile(int x, int y) {
-        return tiles.stream().filter(var -> var.getX() == x && var.getY() == y).collect(Collectors.toList()).get(0);
+        try {
+            return tiles.stream().filter(var -> var.getX() == x && var.getY() == y).collect(Collectors.toList()).get(0);
+        } catch(IndexOutOfBoundsException e) { }
+        return null;
     }
 
     public void sortTiles() {
         tiles.sort((Tile t1, Tile t2) -> (Integer.compare(t2.getX(), t1.getX())));
         tiles.sort(Comparator.comparingInt(Tile::getY));
+    }
+
+    public Vector2 tileToScreenPosition(int x, int y) {
+        int offX = (x * getTileOffset().x / 2  + y * getTileOffset().x / 2) + getOrigin().x;
+        int offY = (y * getTileOffset().y / 2 - x * getTileOffset().y / 2) + getOrigin().y;
+
+        return new Vector2(offX + (int) ((32) * camera.getZoom()), offY + (int) ((16) * camera.getZoom()));
     }
 
     public Vector2 getSelectedTile(Vector2 mousePosition) {
@@ -106,6 +119,35 @@ public class World {
         Main.display.graphics.drawLine(offX + getTileOffset().x / 2, offY, offX + getTileOffset().x, offY + getTileOffset().y / 2);
         Main.display.graphics.drawLine(offX + getTileOffset().x, offY + getTileOffset().y / 2, offX + getTileOffset().x / 2, offY + getTileOffset().y);
         Main.display.graphics.drawLine(offX + getTileOffset().x / 2, offY + getTileOffset().y, offX, offY + getTileOffset().y / 2);
+    }
+
+    public void drawParticle(int x, int y, ArrayList<Color> colors) {
+        Random random = new Random();
+        int speed = 2;
+        int dx = (int) (((Math.random() * (random.nextBoolean() ? + speed : - speed)) + (random.nextBoolean() ? + 1 : - 1)) * camera.getZoom());
+        int dy = (int) (((Math.random() * (random.nextBoolean() ? + speed : - speed)) + (random.nextBoolean() ? + 1 : - 1)) * camera.getZoom());
+        int size = (int) ((Math.random() * 8) * camera.getZoom());
+        int life = (int) (Math.random() * 5) + 10;
+
+        particles.add(new Particle(Main.display, x, y, dx, dy, size, life, colors));
+    }
+
+    public void drawParticle(int x, int y, Color color) {
+        ArrayList<Color> colors = new ArrayList<>();
+        colors.add(color);
+        drawParticle(x, y, colors);
+    }
+
+    public void renderParticles() {
+        for(int i = 0; i < particles.size(); i++) {
+            if(particles.get(i).update()) {
+                particles.remove(i);
+            }
+        }
+
+        for(int i = 0; i <= particles.size() - 1; i++){
+            particles.get(i).render();
+        }
     }
 
     public ArrayList<Tile> getTiles() {
