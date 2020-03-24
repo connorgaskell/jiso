@@ -29,8 +29,10 @@ public class World {
     }
 
     public void addTile(int x, int y, BufferedImage image) {
-        tiles.add(new Tile(x, y, image));
-        sortTiles();
+        try {
+            tiles.add(new Tile(x, y, image));
+            sortTiles();
+        } catch(Exception e) { }
     }
 
     public void removeTile(int x, int y) {
@@ -43,6 +45,7 @@ public class World {
 
     public boolean addObject(int x, int y, BufferedImage image) {
         try {
+            System.out.println(getTile(x, y));
             getTile(x, y).addGameObject(new GameObject(image, false, false, 0));
             sortTiles();
             return true;

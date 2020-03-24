@@ -47,7 +47,7 @@ public class Particle {
         x += dx;
         y += dy;
         life--;
-        size *= 0.99999999995f;
+        size -= 0.00000001f;
         colorAlpha -= 10;
         color = new Color(color.getRed(), color.getGreen(), color.getBlue(), colorAlpha);
         if(life < 0) return true;

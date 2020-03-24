@@ -92,7 +92,7 @@ public class GameMap extends IsoScript {
                     displayTemporaryLabel("You already have the minimum number of tiles in your world!", 1000);
                 }
 
-                if(!isShiftDown && isInWorldBounds(world, mousePosition) && world.isTileNear(world.getSelectedTile(mousePosition))) {
+                if(!isShiftDown && isInWorldBounds(world, mousePosition) && world.isTileNear(world.getSelectedTile(mousePosition)) && world.getTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y) == null) {
                     world.addTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, floorImage);
                 } else {
                     displayTemporaryLabel("You cannot place a tile here!", 1000);
