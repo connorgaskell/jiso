@@ -25,6 +25,7 @@ public class GameMap extends IsoScript {
     private Vector2 mousePosition = new Vector2();
     private boolean isShiftDown = false;
     private Sound ambientSound, breakSound;
+    private int starterTileAmount = 10;
 
     @Override
     public void onStart() {
@@ -36,8 +37,8 @@ public class GameMap extends IsoScript {
         } catch (IOException e) { }
 
         world = new World(getDisplay(), ((GameCamera)getScript("game.GameCamera")).getCamera());
-        for(int x = 0; x < 10; x++) {
-            for(int y = 0; y < 10; y++) {
+        for(int x = 0; x < starterTileAmount; x++) {
+            for(int y = 0; y < starterTileAmount; y++) {
                 world.addTile(x, y, floorImage);
             }
         }
@@ -64,9 +65,7 @@ public class GameMap extends IsoScript {
                 world.drawFloor(world.getTiles().get(i).getX(), world.getTiles().get(i).getY(), world.getTiles().get(i).getImage());
             }
 
-            if(isInWorldBounds(world, mousePosition)) {
-                world.drawImage(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, 4, world.isTileNear(world.getSelectedTile(mousePosition)) ? highlightImage : highlightImageRed);
-            }
+            world.drawImage(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, 4, isInWorldBounds(world, mousePosition) ? highlightImage : highlightImageRed);
 
             for (int i = 0; i < world.getTiles().size(); i++) {
                 for (int j = 0; j < world.getTiles().get(i).getGameObjects().size(); j++) {
@@ -92,7 +91,7 @@ public class GameMap extends IsoScript {
                     displayTemporaryLabel("You already have the minimum number of tiles in your world!", 1000);
                 }
 
-                if(!isShiftDown && isInWorldBounds(world, mousePosition) && world.isTileNear(world.getSelectedTile(mousePosition)) && world.getTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y) == null) {
+                if(!isShiftDown && isInWorldBounds(world, mousePosition) && world.getTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y) == null) {
                     world.addTile(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, floorImage);
                 } else {
                     displayTemporaryLabel("You cannot place a tile here!", 1000);
@@ -159,6 +158,10 @@ public class GameMap extends IsoScript {
 
     public World getWorld() {
         return world;
+    }
+
+    public int getStarterTileAmount() {
+        return starterTileAmount;
     }
 
 }

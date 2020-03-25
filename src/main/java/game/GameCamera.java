@@ -21,7 +21,7 @@ public class GameCamera extends IsoScript {
     @Override
     public void onStart() {
         GameMap gameMap = ((GameMap)getScript("game.GameMap"));
-        camera.setOffset(gameMap.getWorld().getNumTiles() * 22f,0);
+        camera.setOffset((gameMap.getWorld().getNumTiles() * 32) - (gameMap.getStarterTileAmount() * 32),0);
     }
 
     @Override
