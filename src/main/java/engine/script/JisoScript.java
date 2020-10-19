@@ -18,7 +18,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.stream.Collectors;
 
-public abstract class IsoScript {
+public abstract class JisoScript {
 
     private String scriptName;
 
@@ -42,7 +42,7 @@ public abstract class IsoScript {
         return (world.getSelectedTile(mousePosition).x >= 0 && world.getSelectedTile(mousePosition).x < world.getNumTiles() && world.getSelectedTile(mousePosition).y >= 0 && world.getSelectedTile(mousePosition).y < world.getNumTiles());
     }
 
-    public IsoScript getScript(String name) {
+    public JisoScript getScript(String name) {
         try {
             return getDisplay().getScripts().stream().filter(var -> var.getScriptName() == name).collect(Collectors.toList()).get(0);
         } catch(NullPointerException e) { }

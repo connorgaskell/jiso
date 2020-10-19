@@ -23,6 +23,8 @@ public class World {
     private ArrayList<Tile> tiles = new ArrayList<>();
     private ArrayList<Particle> particles = new ArrayList<>(500);
 
+    private GameObject selectedObject = null;
+
     public World(Display display, Camera camera) {
         this.display = display;
         this.camera = camera;
@@ -43,15 +45,46 @@ public class World {
         sortTiles();
     }
 
-    public boolean addObject(int x, int y, BufferedImage image) {
+    public boolean addObject(int x, int y, BufferedImage image, int heightOffset) {
         try {
             System.out.println(getTile(x, y));
-            getTile(x, y).addGameObject(new GameObject(image, false, false, 0));
+            getTile(x, y).addGameObject(new GameObject(new Vector2(x, y), image, false, false, heightOffset));
             sortTiles();
             return true;
         } catch(Exception e) {
             return false;
         }
+    }
+
+    public void removeObject(int x, int y) {
+        if(getTile(x, y) != null && getTile(x, y).getFirstGameObject() != null) {
+            getTile(x, y).removeGameObject();
+            selectedObject = null;
+        }
+    }
+
+    public void selectObject(int x, int y) {
+        if(getTile(x, y) != null && getTile(x, y).getFirstGameObject() != null) {
+            selectedObject = getTile(x, y).getLastGameObject();
+        }
+    }
+
+    public void moveSelectedObject(int moveX, int moveY) {
+        if(selectedObject == null) return;
+        moveSelectedObjectTo(selectedObject.getPosition().x + moveX, selectedObject.getPosition().y + moveY);
+    }
+
+    public void moveSelectedObjectTo(int x, int y) {
+        if(selectedObject == null) return;
+        if(getTile(x, y) != null) {
+            getTile(selectedObject.getPosition().x, selectedObject.getPosition().y).removeGameObject();
+            selectedObject.setPosition(new Vector2(x, y));
+            getTile(selectedObject.getPosition().x, selectedObject.getPosition().y).addGameObject(selectedObject);
+        }
+    }
+
+    public void deselectObject() {
+        selectedObject = null;
     }
 
     public boolean isTileNear(Vector2 pos) {
@@ -100,11 +133,11 @@ public class World {
 
     public void drawFloor(int x, int y, BufferedImage image) { drawFloor(x, y, 0, image); }
 
-    public void drawObject(int x, int y, BufferedImage image) { drawObject(x, y, 16, image); }
+    public void drawObject(int x, int y, BufferedImage image) { drawObject(x, y, image, 16); }
 
     public void drawFloor(int x, int y, int heightOffset, BufferedImage image) { drawImage(x, y, heightOffset, image); }
 
-    public void drawObject(int x, int y, int heightOffset, BufferedImage image) { drawImage(x, y, heightOffset, image); }
+    public void drawObject(int x, int y, BufferedImage image, int heightOffset) { drawImage(x, y, heightOffset, image); }
 
     public void drawImage(int x, int y, int heightOffset, BufferedImage image) {
         int offX = (x * getTileOffset().x / 2  + y * getTileOffset().x / 2) + getOrigin().x;
@@ -157,4 +190,7 @@ public class World {
         return tiles;
     }
 
+    public GameObject getSelectedObject() {
+        return selectedObject;
+    }
 }

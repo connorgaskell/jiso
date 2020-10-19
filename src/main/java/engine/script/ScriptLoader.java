@@ -8,19 +8,19 @@ import java.util.stream.IntStream;
 
 public class ScriptLoader {
 
-    private ArrayList<IsoScript> loadedScripts = new ArrayList<>();
+    private ArrayList<JisoScript> loadedScripts = new ArrayList<>();
 
     public ScriptLoader() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         for(int i = 0; i < getClasses("game").length; i++) {
-            IsoScript script = (IsoScript) Class.forName(getClasses("game")[i].getName()).newInstance();
+            JisoScript script = (JisoScript) Class.forName(getClasses("game")[i].getName()).newInstance();
             script.setScriptName(getClasses("game")[i].getName());
             loadedScripts.add(script);
         }
     }
 
-    public void startScripts(ArrayList<IsoScript> scripts) {
+    public void startScripts(ArrayList<JisoScript> scripts) {
         // Clone the passed ArrayList into a temporary ArrayList.
-        ArrayList<IsoScript> tempScripts = (ArrayList<IsoScript>)scripts.clone();
+        ArrayList<JisoScript> tempScripts = (ArrayList<JisoScript>)scripts.clone();
 
         try {
             // Iterate through the ArrayList and call the onStart() method of each IsoScript, if successful this element can be removed from the ArrayList.
@@ -38,7 +38,7 @@ public class ScriptLoader {
         }
     }
 
-    public ArrayList<IsoScript> getLoadedScripts() {
+    public ArrayList<JisoScript> getLoadedScripts() {
         return loadedScripts;
     }
 

@@ -1,7 +1,5 @@
 package engine.objects;
 
-import engine.objects.GameObject;
-
 import java.awt.image.*;
 import java.util.*;
 
@@ -33,16 +31,28 @@ public class Tile {
         gameObjects.add(gameObject);
     }
 
+    public void removeGameObject() {
+        gameObjects.remove(getLastGameObject());
+    }
+
     public ArrayList<GameObject> getGameObjects() {
         return gameObjects;
     }
 
     public GameObject getLastGameObject() {
-        return gameObjects.get(gameObjects.size() - 1);
+        try {
+            return gameObjects.get(gameObjects.size() - 1);
+        } catch(IndexOutOfBoundsException ex) {
+            return null;
+        }
     }
 
     public GameObject getFirstGameObject() {
-        return gameObjects.get(0);
+        try {
+            return gameObjects.get(0);
+        } catch(IndexOutOfBoundsException ex) {
+            return null;
+        }
     }
 
 }

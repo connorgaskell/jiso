@@ -1,6 +1,6 @@
 package game;
 
-import engine.script.IsoScript;
+import engine.script.JisoScript;
 import engine.sound.Sound;
 import engine.ui.*;
 import engine.ui.Button;
@@ -16,11 +16,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class GameHUD extends IsoScript {
+public class GameHUD extends JisoScript {
 
     private UI ui = defaultUI();
     BufferedImage menuImage;
     private Sound clickSound;
+
+    private Label coinsLabel;
+
+    GameLogic gameLogic;
+    private int coins;
 
     @Override
     public void onStart() {
@@ -48,6 +53,11 @@ public class GameHUD extends IsoScript {
             button1.setMouseActionEvent(e, button1, 0.025f);
         });
 
+        gameLogic = ((GameLogic)getScript("game.GameLogic"));
+
+        coinsLabel = label(getUI(), "Coins: " + gameLogic.getCoins(), 12.0f, Color.WHITE, Anchor.BOTTOM_RIGHT);
+        coinsLabel.padding = new Vector2(5, 5);
+
         Label versionLabel = label(getUI(), "Game - Version 0.0.1", 12.0f, Color.WHITE, Anchor.BOTTOM_LEFT);
         versionLabel.padding = new Vector2(5, 5);
     }
@@ -55,6 +65,7 @@ public class GameHUD extends IsoScript {
     @Override
     public void onDrawFrame() {
         ui.renderUI();
+        coinsLabel.setText("Coins: " + gameLogic.getCoins());
     }
 
     public void destroyAllComponentsWithName(ArrayList<UIComponent> components, String name) {

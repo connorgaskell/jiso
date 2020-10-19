@@ -1,7 +1,7 @@
 package game;
 
 import engine.objects.World;
-import engine.script.IsoScript;
+import engine.script.JisoScript;
 import engine.sound.Sound;
 import engine.ui.Anchor;
 import engine.ui.Label;
@@ -17,7 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class GameMap extends IsoScript {
+public class GameMap extends JisoScript {
 
     private World world;
     private BufferedImage objectImage, floorImage, highlightImage, highlightImageRed;
@@ -27,10 +27,14 @@ public class GameMap extends IsoScript {
     private Sound ambientSound, breakSound;
     private int starterTileAmount = 10;
 
+    private GameLogic gameLogic;
+
     @Override
     public void onStart() {
+        gameLogic = ((GameLogic)getScript("game.GameLogic"));
+
         try {
-            objectImage = ImageIO.read(this.getClass().getResource("../Images/TileObject.png"));
+            objectImage = ImageIO.read(this.getClass().getResource("../Images/HouseObject.png"));
             floorImage = ImageIO.read(this.getClass().getResource("../Images/FloorTile.png"));
             highlightImage = ImageIO.read(this.getClass().getResource("../Images/HighlightTile.png"));
             highlightImageRed = ImageIO.read(this.getClass().getResource("../Images/HighlightTileRed.png"));
@@ -43,7 +47,7 @@ public class GameMap extends IsoScript {
             }
         }
 
-        world.addObject(0, 0, objectImage);
+        world.addObject(0, 0, objectImage, 10);
 
         ui = ((GameHUD)getScript("game.GameHUD")).getUI();
         Label versionLabel = label(ui, "Game - Version 0.0.1", 12.0f, Color.WHITE, Anchor.BOTTOM_LEFT);
@@ -69,7 +73,7 @@ public class GameMap extends IsoScript {
 
             for (int i = 0; i < world.getTiles().size(); i++) {
                 for (int j = 0; j < world.getTiles().get(i).getGameObjects().size(); j++) {
-                    world.drawObject(world.getTiles().get(i).getX(), world.getTiles().get(i).getY(), world.getTiles().get(i).getGameObjects().get(j).getObjectImage());
+                    world.drawObject(world.getTiles().get(i).getX(), world.getTiles().get(i).getY(), world.getTiles().get(i).getGameObjects().get(j).getObjectImage(), world.getTiles().get(i).getGameObjects().get(j).getHeightOffset());
                 }
             }
         } catch (Exception e) { }
@@ -100,9 +104,15 @@ public class GameMap extends IsoScript {
 
             case MouseEvent.BUTTON3:
                 if(isInWorldBounds(world, mousePosition)) {
-                    boolean success = world.addObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, objectImage);
-                    if(!success) {
-                        displayTemporaryLabel("You cannot place an object here!", 1000);
+                    boolean canBuy = gameLogic.removeCoins(100);
+                    if(canBuy) {
+                        boolean canPlace = world.addObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y, objectImage, 10);
+                        if(!canPlace) {
+                            displayTemporaryLabel("You cannot place an object here!", 1000);
+                            gameLogic.addCoins(100);
+                        }
+                    } else {
+                        displayTemporaryLabel("You cannot afford this building!", 1000);
                     }
                 } else {
                     displayTemporaryLabel("You cannot place an object here!", 1000);
@@ -134,6 +144,15 @@ public class GameMap extends IsoScript {
     public void onMouseMoved(MouseEvent e) {
         mousePosition.x = e.getX();
         mousePosition.y = e.getY();
+
+        try {
+            if (world.getSelectedObject() != null) {
+                world.moveSelectedObjectTo(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y);
+            }
+        } catch(Exception ex) {
+            // The tile the selectedObject was on has probably been deleted, so deselect the object.
+            world.deselectObject();
+        }
     }
 
     @Override
@@ -146,6 +165,30 @@ public class GameMap extends IsoScript {
     public void onKeyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
             isShiftDown = true;
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            world.removeObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y);
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (world.getSelectedObject() != null) {
+                world.deselectObject();
+            } else {
+                world.selectObject(world.getSelectedTile(mousePosition).x, world.getSelectedTile(mousePosition).y);
+            }
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_1) {
+            world.moveSelectedObject(1, 0);
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_2) {
+
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_3) {
+
         }
     }
 

@@ -2,7 +2,7 @@ package engine.core;
 
 import engine.input.KeyInput;
 import engine.input.MouseInput;
-import engine.script.IsoScript;
+import engine.script.JisoScript;
 import engine.script.ScriptLoader;
 import engine.vector.Vector2;
 
@@ -53,7 +53,7 @@ public class Display extends JPanel {
         return mainFont;
     }
 
-    public ArrayList<IsoScript> getScripts() {
+    public ArrayList<JisoScript> getScripts() {
         return scriptLoader.getLoadedScripts();
     }
 

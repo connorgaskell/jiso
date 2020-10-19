@@ -1,5 +1,7 @@
 package engine.objects;
 
+import engine.vector.Vector2;
+
 import java.awt.image.BufferedImage;
 
 public class GameObject {
@@ -8,12 +10,16 @@ public class GameObject {
     private boolean canPlaceOn;
     private boolean isWalkable;
     private int heightOffset;
+    private Vector2 position = new Vector2();
 
-    public GameObject(BufferedImage objectImage, boolean canPlaceOn, boolean isWalkable, int heightOffset) {
+    public GameObject(Vector2 position, BufferedImage objectImage, boolean canPlaceOn, boolean isWalkable, int heightOffset) {
         this.objectImage = objectImage;
         this.canPlaceOn = canPlaceOn;
         this.heightOffset = heightOffset;
+        this.position = position;
     }
+
+    public void setPosition(Vector2 position) { this.position = position; }
 
     public void setObjectImage(BufferedImage image) {
         this.objectImage = image;
@@ -27,6 +33,8 @@ public class GameObject {
         this.heightOffset = heightOffset;
     }
 
+    public Vector2 getPosition() { return position; }
+
     public BufferedImage getObjectImage() {
         return objectImage;
     }
@@ -36,7 +44,7 @@ public class GameObject {
     }
 
     public int getHeightOffset() {
-        return getHeightOffset();
+        return heightOffset;
     }
 
 }

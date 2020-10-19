@@ -1,13 +1,12 @@
 package game;
 
 import engine.objects.Camera;
-import engine.script.IsoScript;
-import engine.ui.UI;
+import engine.script.JisoScript;
 import engine.vector.Vector2;
 
 import java.awt.event.*;
 
-public class GameCamera extends IsoScript {
+public class GameCamera extends JisoScript {
 
     private Camera camera = defaultCamera();
 
